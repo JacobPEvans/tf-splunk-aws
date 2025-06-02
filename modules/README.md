@@ -6,7 +6,7 @@ This directory contains consolidated, reusable Terraform modules for deploying S
 
 ### Core Infrastructure Modules
 
-#### 🌐 `networking/`
+#### 🌐 `network/`
 **Comprehensive networking foundation**
 - VPC with public/private subnets across multiple AZs
 - Internet Gateway and NAT Gateways for secure connectivity
@@ -87,9 +87,9 @@ This directory contains consolidated, reusable Terraform modules for deploying S
 ### Basic Infrastructure Deployment
 
 ```hcl
-# Networking foundation
-module "networking" {
-  source = "./modules/networking"
+# Network foundation
+module "network" {
+  source = "./modules/network"
   
   environment             = "dev"
   vpc_cidr               = "10.0.0.0/16"
@@ -103,7 +103,7 @@ module "security" {
   source = "./modules/security"
   
   environment    = "dev"
-  vpc_id         = module.networking.vpc_id
+  vpc_id         = module.network.vpc_id
   enable_guardduty = true
   enable_cloudtrail = true
   
@@ -125,9 +125,8 @@ module "security" {
 module "splunk" {
   source = "./modules/splunk"
   
-  environment          = "dev"
-  vpc_id              = module.networking.vpc_id
-  private_subnet_ids  = module.networking.private_subnet_ids
+  environment          = "dev"  vpc_id              = module.network.vpc_id
+  private_subnet_ids  = module.network.private_subnet_ids
   splunk_admin_password = "SecurePassword123!"
   
   indexer_config = {
@@ -152,9 +151,8 @@ module "splunk" {
 module "monitoring" {
   source = "./modules/monitoring"
   
-  environment         = "dev"
-  vpc_id             = module.networking.vpc_id
-  subnet_ids         = module.networking.private_subnet_ids
+  environment         = "dev"  vpc_id             = module.network.vpc_id
+  subnet_ids         = module.network.private_subnet_ids
   splunk_indexer_ips = module.splunk.indexer_instances.private_ips
   
   syslog_config = {
@@ -178,8 +176,7 @@ module "monitoring" {
 ## 🔧 Module Dependencies
 
 ```mermaid
-graph TD
-    A[networking] --> B[security]
+graph TD    A[network] --> B[security]
     A --> C[compute]
     A --> D[splunk]
     A --> E[monitoring]

@@ -5,7 +5,7 @@ This repository contains a Terragrunt-driven Terraform configuration for deployi
 ## Features
 
 - Terragrunt-managed environment hierarchy
-- Modular Terraform codebase using logical units (networking, compute, storage, security)
+- Modular Terraform codebase using logical units (network, compute, monitoring, security)
 - Configurable support for Splunk components:
   - Deployment server
   - Indexers

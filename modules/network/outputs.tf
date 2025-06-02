@@ -1,4 +1,4 @@
-# Networking module outputs
+# Network module outputs
 
 output "vpc_id" {
   description = "ID of the VPC"

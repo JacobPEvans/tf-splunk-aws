@@ -1,4 +1,4 @@
-# Comprehensive networking module for Splunk AWS infrastructure
+# Comprehensive network module for Splunk AWS infrastructure
 # Handles VPC, subnets, routing, NAT gateways, and basic security groups
 
 variable "environment" {
