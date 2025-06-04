@@ -71,7 +71,7 @@ resource "aws_instance" "nat" {
   key_name               = var.key_pair_name
   vpc_security_group_ids = [var.nat_security_group_id]
   subnet_id              = var.public_subnet_ids[0] # Use first public subnet
-  source_dest_check      = false # Required for NAT functionality
+  source_dest_check      = false                    # Required for NAT functionality
 
   user_data = local.nat_user_data
 
@@ -79,7 +79,7 @@ resource "aws_instance" "nat" {
     volume_type = "gp3"
     volume_size = 8
     encrypted   = true
-    
+
     tags = merge(local.common_tags, {
       Name = "${var.environment}-nat-instance-root"
     })

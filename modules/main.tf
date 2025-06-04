@@ -15,22 +15,22 @@ terraform {
 module "network" {
   source = "./network"
 
-  environment            = var.environment
-  vpc_cidr              = var.vpc_cidr
-  availability_zones    = var.availability_zones
-  public_subnet_cidrs   = var.public_subnet_cidrs
-  private_subnet_cidrs  = var.private_subnet_cidrs
+  environment          = var.environment
+  vpc_cidr             = var.vpc_cidr
+  availability_zones   = var.availability_zones
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  private_subnet_cidrs = var.private_subnet_cidrs
 }
 
 # Security Module
 module "security" {
   source = "./security"
 
-  environment            = var.environment
-  vpc_id                = module.network.vpc_id
-  vpc_cidr_blocks       = [module.network.vpc_cidr_block]
-  private_subnet_cidrs  = var.private_subnet_cidrs
-  enable_ssh_access     = var.key_pair_name != null
+  environment          = var.environment
+  vpc_id               = module.network.vpc_id
+  vpc_cidr_blocks      = [module.network.vpc_cidr_block]
+  private_subnet_cidrs = var.private_subnet_cidrs
+  enable_ssh_access    = var.key_pair_name != null
 }
 
 # Compute Module (NAT Instance)
@@ -48,7 +48,7 @@ module "compute" {
 module "splunk" {
   source = "./splunk"
 
-  environment                   = var.environment
+  environment                  = var.environment
   splunk_instance_type         = var.splunk_instance_type
   splunk_root_volume_size      = var.splunk_root_volume_size
   splunk_data_volume_size      = var.splunk_data_volume_size

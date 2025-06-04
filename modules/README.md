@@ -5,6 +5,7 @@ This directory contains modular Terraform configurations for deploying cost-opti
 ## 📁 Module Structure
 
 ### Root Module
+
 - **main.tf**: Orchestrates all sub-modules with proper dependencies
 - **variables.tf**: Centralized variable definitions
 - **outputs.tf**: Aggregated outputs from all modules
@@ -12,51 +13,49 @@ This directory contains modular Terraform configurations for deploying cost-opti
 ### Infrastructure Modules
 
 #### 🌐 `network/`
-**Networking foundation**
+
+Networking foundation:
+
 - VPC with DNS resolution enabled
 - Public/private subnets across multiple AZs  
 - Internet Gateway for public connectivity
 - Route tables for traffic routing
 
 #### 🔒 `security/`
-**Security and access management**
+
+Security and access management:
+
 - Security groups for NAT and Splunk instances
 - IAM roles and policies for EC2 instances
 - Principle of least privilege access
 
-#### � `compute/`  
-**Cost-optimized compute resources**
+#### 💻 `compute/`
+
+Cost-optimized compute resources:
+
 - t3.nano NAT instance (replaces expensive NAT Gateway)
 - CloudWatch log groups for monitoring
 - User data scripts for NAT functionality
 
 #### 🔍 `splunk/`
-**Splunk infrastructure**
+
+Splunk infrastructure:
+
 - t3.small Splunk instance
 - Encrypted EBS volumes for data storage
 - CloudWatch integration for logging
 - User data scripts for Splunk setup
 
-**Key Features:**
+## Key Features
+
 - Cost-optimized NAT instance (saves ~$45/month vs NAT Gateway)
 - CloudWatch integration for monitoring  
 - Automated user data scripts
 - Proper security group configuration
 
-## 💰 Cost Optimization
+## 💰 Cost Efficiency
 
-**Monthly Cost Breakdown:**
-| Resource | Type | Monthly Cost |
-|----------|------|--------------|
-| NAT Instance | t3.nano | ~$3.50 |
-| Splunk Instance | t3.small | ~$15.33 |
-| EBS Storage | 70GB GP3 | ~$2.97 |
-| **Total** | | **~$21.80** |
-
-**Cost Savings:**
-- Using t3.nano NAT instance instead of NAT Gateway saves ~$45/month
-- GP3 EBS volumes provide cost-effective storage
-- Right-sized instances for workload requirements
+For detailed cost breakdown, see [main README](../README.md).
 
 ## 🚀 Usage
 
@@ -73,11 +72,9 @@ terragrunt plan
 
 # Review the plan output, then apply
 terragrunt apply
-```
-
 ### Module Dependencies
 
-```
+```text
 network (VPC, subnets, routing)
     ↓
 security (security groups, IAM)

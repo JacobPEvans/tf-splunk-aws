@@ -1,75 +1,69 @@
-# TF-Splunk-AWS Project Instructions
+# Project Scope & Business Context
 
-**AI Assistant Context File for GitHub Copilot**
+## Overview
 
-## Project Overview
-This is a **cost-optimized Splunk infrastructure on AWS** using Terraform and Terragrunt. The project uses a modular architecture with 4 separate modules to maintain proper separation of concerns while keeping costs under $25/month.
+Cost-optimized Splunk infrastructure on AWS demonstrating 77% cost reduction through architectural optimization. Uses modular Terraform with Terragrunt for infrastructure-as-code best practices.
 
-## Project Scope & Boundaries
+**Key Achievement**: Reduced monthly costs from ~$97 to ~$21.80 by replacing NAT Gateways with cost-optimized NAT instances.
 
-### ✅ ALLOWED CHANGES
-- Bug fixes in existing Terraform code
-- Documentation updates and improvements
-- Adding missing outputs or variables
-- Security improvements that don't increase costs
-- Performance optimizations within cost constraints
-- Adding staging/production environment configurations
+## Business Value
 
-### ❌ STRICTLY FORBIDDEN CHANGES
-- **DO NOT** add NAT Gateways (cost: ~$45/month each)
-- **DO NOT** change instance types without cost analysis
-- **DO NOT** modify the core consolidated architecture without explicit approval
-- **DO NOT** automatically run `terragrunt apply`
+### Problem Solved
 
-## Change Approval Workflow
+Standard AWS Splunk deployments using NAT Gateways cost ~$97/month for basic infrastructure. This project demonstrates enterprise-grade cost optimization while maintaining security and reliability.
 
-### 🟢 AUTO-APPROVED (No permission needed)
+### Solution Approach
+
+- **Cost Optimization**: t3.nano NAT instance instead of NAT Gateway (~92% savings)
+- **Modular Design**: 4 focused modules for maintainability and reusability
+- **Infrastructure as Code**: Terragrunt-managed Terraform with remote state
+- **Security First**: VPC isolation, encrypted storage, least privilege access
+
+## Project Constraints
+
+### Cost Targets
+
+- **Maximum Budget**: $25/month
+- **Current Cost**: ~$21.80/month
+- **Cost Analysis Required**: For any new resources
+
+### Technical Boundaries
+
+- **Region**: us-east-2 (cost-optimized)
+- **Deployment Method**: Terragrunt only (no direct Terraform)
+- **Instance Types**: Right-sized for cost optimization
+- **State Management**: S3 + DynamoDB remote state
+
+## Change Management
+
+### Low-Risk Changes (Self-Approved)
+
 - Documentation updates
 - Variable descriptions
 - Output additions
-- README improvements
-- Comment additions
+- Comment improvements
 
-### 🟡 REQUIRES DISCUSSION (Ask user first)
+### Medium-Risk Changes (Discussion Required)
+
 - New AWS resources
-- Instance type changes
 - Security group modifications
-- Cost-impacting changes
-- Architecture modifications
+- Instance type changes
+- Cost-impacting modifications
 
-### 🔴 REQUIRES EXPLICIT APPROVAL (Must get clear user consent)
+### High-Risk Changes (Explicit Approval)
+
 - Infrastructure deployment (`terragrunt apply`)
+- Architectural modifications
 - Regional changes
-- Module restructuring
-- Breaking changes to existing resources
+- Breaking changes
 
-## Cost Constraints (CRITICAL)
-- **Maximum Monthly Cost**: $25
-- **Current Estimated Cost**: ~$21.80/month
-- **Always provide cost estimates** for any new resources
-- **Always choose cheapest options** that meet requirements
-- **Document cost impact** of any proposed changes
+## Success Metrics
 
-## Current Project State
-- **Status**: Successfully consolidated and planned ✅
-- **Last Successful Plan**: 23 resources ready to create
-- **Architecture**: Single module with NAT instance (not gateway)
-- **Region**: us-east-2
-- **Environments**: dev (configured), stg/prod (templates ready)
-
-## Communication Guidelines
-- **Always reference this file** when making infrastructure changes
-- **Explain cost impact** of any proposed modifications
-- **Confirm scope** before starting major changes
-- **Suggest alternatives** if user requests expensive solutions
-
-## Project Goals (Original Objectives)
-1. ✅ **Cost Optimization**: Reduced from ~$97/month to ~$21.80/month (77% savings)
-2. ✅ **Modular Structure**: Organized into 4 focused modules (network, security, compute, splunk)
-3. ✅ **DRY Principles**: Eliminated code duplication across modules
-4. ✅ **Successful Planning**: All 23 resources validated via terragrunt plan
-5. 🔄 **Future**: Deploy only when explicitly requested by user
+1. **Cost Optimization**: 77% reduction achieved ($97 → $21.80/month)
+2. **Modular Architecture**: 4 focused modules implemented
+3. **Code Quality**: DRY principles, proper separation of concerns
+4. **Deployment Ready**: 22 resources validated via `terragrunt plan`
 
 ---
-*Last Updated: June 3, 2025*
-*This file should be consulted before any infrastructure modifications*
+
+Last Updated: June 3, 2025

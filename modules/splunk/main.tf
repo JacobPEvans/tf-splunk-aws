@@ -90,7 +90,7 @@ resource "aws_instance" "splunk" {
     volume_type = "gp3"
     volume_size = var.splunk_root_volume_size
     encrypted   = true
-    
+
     tags = merge(local.common_tags, {
       Name = "${var.environment}-splunk-root"
     })
@@ -102,7 +102,7 @@ resource "aws_instance" "splunk" {
     volume_type = "gp3"
     volume_size = var.splunk_data_volume_size
     encrypted   = true
-    
+
     tags = merge(local.common_tags, {
       Name = "${var.environment}-splunk-data"
     })
