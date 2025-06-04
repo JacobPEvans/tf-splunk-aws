@@ -1,43 +1,26 @@
-# Splunk module outputs
+# Splunk Module Outputs
 
-output "indexer_instances" {
-  description = "Splunk indexer instance details"
-  value = {
-    ids         = aws_instance.indexer[*].id
-    private_ips = aws_instance.indexer[*].private_ip
-    public_ips  = aws_instance.indexer[*].public_ip
-  }
+output "splunk_instance_id" {
+  description = "ID of the Splunk instance"
+  value       = aws_instance.splunk.id
 }
 
-output "search_head_instances" {
-  description = "Splunk search head instance details"
-  value = {
-    ids         = aws_instance.search_head[*].id
-    private_ips = aws_instance.search_head[*].private_ip
-    public_ips  = aws_instance.search_head[*].public_ip
-  }
+output "splunk_instance_private_ip" {
+  description = "Private IP address of the Splunk instance"
+  value       = aws_instance.splunk.private_ip
 }
 
-output "forwarder_instances" {
-  description = "Universal forwarder instance details"
-  value = {
-    ids         = aws_instance.forwarder[*].id
-    private_ips = aws_instance.forwarder[*].private_ip
-    public_ips  = aws_instance.forwarder[*].public_ip
-  }
+output "splunk_web_url" {
+  description = "URL for Splunk Web interface (internal)"
+  value       = "http://${aws_instance.splunk.private_ip}:8000"
 }
 
-output "security_group_id" {
-  description = "ID of the Splunk security group"
-  value       = aws_security_group.splunk.id
+output "splunk_cloudwatch_log_group" {
+  description = "CloudWatch log group for Splunk instance"
+  value       = aws_cloudwatch_log_group.splunk.name
 }
 
-output "iam_role_arn" {
-  description = "ARN of the Splunk IAM role"
-  value       = aws_iam_role.splunk.arn
-}
-
-output "splunk_web_urls" {
-  description = "URLs to access Splunk Web interface"
-  value       = [for ip in aws_instance.search_head[*].private_ip : "https://${ip}:8000"]
+output "splunk_app_log_group" {
+  description = "CloudWatch log group for Splunk application logs"
+  value       = aws_cloudwatch_log_group.splunk_app.name
 }
