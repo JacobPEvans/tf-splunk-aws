@@ -46,8 +46,8 @@ locals {
 
     # Download and install Splunk (using a basic installation)
     cd /opt
-    wget -O splunk-${var.splunk_version}-${var.splunk_build}-Linux-x86_64.tgz "https://download.splunk.com/products/splunk/releases/${var.splunk_version}/linux/splunk-${var.splunk_version}-${var.splunk_build}-Linux-x86_64.tgz"
-    tar -xzf splunk-${var.splunk_version}-${var.splunk_build}-Linux-x86_64.tgz
+    wget -O splunk-${var.splunk_version}-${var.splunk_build}-Linux-aarch64.tgz "https://download.splunk.com/products/splunk/releases/${var.splunk_version}/linux/splunk-${var.splunk_version}-${var.splunk_build}-Linux-aarch64.tgz"
+    tar -xzf splunk-${var.splunk_version}-${var.splunk_build}-Linux-aarch64.tgz
     chown -R splunk:splunk /opt/splunk
 
     # Retrieve Splunk admin password from SSM Parameter Store (never stored in user_data)

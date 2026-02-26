@@ -68,7 +68,7 @@ output "splunk_web_url" {
 # Cost Estimation
 output "estimated_monthly_cost" {
   description = "Estimated monthly cost in USD"
-  value       = "~$21.80 (t3.nano NAT: $3.50, t3.small Splunk: $15.33, EBS: $2.97)"
+  value       = "~$17.67 always-on (t4g.nano NAT: $2.52, t4g.small Splunk: $12.18, EBS: $2.97) | ~$9 with auto-lifecycle (Splunk 25%: ~$3.05, S3: ~$0.50)"
 }
 
 # Access Information

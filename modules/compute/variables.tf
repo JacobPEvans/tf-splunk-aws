@@ -8,7 +8,7 @@ variable "environment" {
 variable "nat_instance_type" {
   description = "Instance type for NAT instance"
   type        = string
-  default     = "t3.nano"
+  default     = "t4g.nano"
 }
 
 variable "key_pair_name" {

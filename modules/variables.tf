@@ -38,13 +38,13 @@ variable "key_pair_name" {
 variable "nat_instance_type" {
   description = "Instance type for NAT instance"
   type        = string
-  default     = "t3.nano"
+  default     = "t4g.nano"
 }
 
 variable "splunk_instance_type" {
   description = "Instance type for Splunk instance"
   type        = string
-  default     = "t3.small"
+  default     = "t4g.small"
 }
 
 variable "splunk_root_volume_size" {

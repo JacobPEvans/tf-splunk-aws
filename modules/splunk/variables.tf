@@ -8,7 +8,7 @@ variable "environment" {
 variable "splunk_instance_type" {
   description = "Instance type for Splunk instance"
   type        = string
-  default     = "t3.small"
+  default     = "t4g.small"
 }
 
 variable "splunk_root_volume_size" {
