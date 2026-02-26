@@ -44,7 +44,7 @@ Use scheduled scaling to stop Splunk off-hours for additional savings.
 ## Technology Stack
 
 - **Terraform/OpenTofu** >= 1.0
-- **AWS Provider** ~> 5.0
+- **AWS Provider** ~> 6.0
 - **Terragrunt** for environment management
 - **SSM Parameter Store** for secrets
 
@@ -121,7 +121,7 @@ Pin dependency versions for reproducibility. Use `~> X.Y` for patch-level flexib
 while locking major/minor versions. This avoids unexpected breaking changes from upstream
 updates while still receiving bug fixes.
 
-- Use `~> X.Y` (e.g., `~> 5.0`) for provider versions — allows patch releases, locks major/minor
+- Use `~> X.Y` (e.g., `~> 6.0`) for provider versions — allows patch releases, locks major/minor
 - Use `>= X.Y` only when a minimum version is required and newer versions are all acceptable
 - Avoid overly tight constraints (e.g., `= X.Y.Z`) unless exact reproducibility is critical
 
