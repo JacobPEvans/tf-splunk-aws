@@ -30,16 +30,18 @@ NETWORK
   Private: 10.0.10.0/24, 10.0.20.0/24 (Splunk lives here)
 ```
 
-## Cost (~$21.80/mo)
+## Cost
 
-| Resource | Instance | Cost |
-| -------- | -------- | ---- |
-| NAT | t3.nano | ~$3.80/mo |
-| Splunk | t3.small | ~$15.03/mo |
-| EBS (70GB gp3) | - | ~$2.97/mo |
+| Resource | Phase 1 (current) | Planned Phase 2+3 |
+| -------- | ----------------- | ----------------- |
+| NAT (t4g.nano) | ~$2.52/mo | ~$2.52/mo |
+| Splunk (t4g.small) | ~$12.18/mo | ~$3.05/mo (25% utilization) |
+| EBS (70GB gp3) | ~$2.97/mo | ~$2.97/mo |
+| S3 SmartStore (planned) | — | ~$0.50/mo |
+| **Total** | **~$17.67/mo** | **~$9/mo** |
 
-Graviton migration planned (see issue #23) — would reduce cost to ~$17.67/mo.
-Use scheduled scaling to stop Splunk off-hours for additional savings.
+Phase 2 will add S3 SmartStore bucket resources and SmartStore configuration.
+Phase 3 will add `enable_auto_lifecycle` toggle and EventBridge Scheduler.
 
 ## Technology Stack
 

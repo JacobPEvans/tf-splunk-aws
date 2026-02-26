@@ -44,10 +44,14 @@ locals {
     # Create splunk user
     useradd -r -m -s /bin/bash splunk
 
-    # Download and install Splunk (using a basic installation)
+    # Download and install Splunk
     cd /opt
-    wget -O splunk-${var.splunk_version}-${var.splunk_build}-Linux-x86_64.tgz "https://download.splunk.com/products/splunk/releases/${var.splunk_version}/linux/splunk-${var.splunk_version}-${var.splunk_build}-Linux-x86_64.tgz"
-    tar -xzf splunk-${var.splunk_version}-${var.splunk_build}-Linux-x86_64.tgz
+    SPLUNK_PKG="splunk-${var.splunk_version}-${var.splunk_build}-Linux-aarch64.tgz"
+    SPLUNK_BASE_URL="https://download.splunk.com/products/splunk/releases/${var.splunk_version}/linux"
+    wget -O "$${SPLUNK_PKG}" "$${SPLUNK_BASE_URL}/$${SPLUNK_PKG}"
+    wget -O "$${SPLUNK_PKG}.sha512" "$${SPLUNK_BASE_URL}/$${SPLUNK_PKG}.sha512"
+    sha512sum -c "$${SPLUNK_PKG}.sha512" || { echo "ERROR: Splunk package checksum mismatch. Aborting." >&2; exit 1; }
+    tar -xzf "$${SPLUNK_PKG}"
     chown -R splunk:splunk /opt/splunk
 
     # Retrieve Splunk admin password from SSM Parameter Store (never stored in user_data)

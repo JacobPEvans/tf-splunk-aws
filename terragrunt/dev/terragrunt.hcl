@@ -15,8 +15,8 @@ inputs = {
   private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
 
   # Instance sizing
-  nat_instance_type       = "t3.nano"
-  splunk_instance_type    = "t3.small"
+  nat_instance_type       = "t4g.nano"
+  splunk_instance_type    = "t4g.small"
   splunk_root_volume_size = 20
   splunk_data_volume_size = 50
 
