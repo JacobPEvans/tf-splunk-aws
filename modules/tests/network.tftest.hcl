@@ -20,6 +20,7 @@ override_module {
     splunk_security_group_id     = "sg-00000000000000002"
     splunk_instance_profile_name = "mock-splunk-instance-profile"
     splunk_iam_role_arn          = "arn:aws:iam::123456789012:role/mock-splunk-role"
+    splunk_password_ssm_name     = "/dev/splunk/admin-password"
   }
 }
 

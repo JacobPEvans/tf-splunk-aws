@@ -23,6 +23,9 @@ inputs = {
   # Optional: Add your key pair name for SSH access
   # key_pair_name = "your-key-pair-name"
 
+  # SSH access: set to specific CIDRs to enable, empty list disables SSH entirely
+  ssh_allowed_cidrs = []
+
   # Set SPLUNK_ADMIN_PASSWORD env var before running (e.g., via aws-vault or doppler)
   splunk_admin_password = get_env("SPLUNK_ADMIN_PASSWORD", "CHANGE_ME_USE_ENV_VAR")
 }

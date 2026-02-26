@@ -46,7 +46,7 @@ Use scheduled scaling to stop Splunk off-hours for additional savings.
 - **Terraform/OpenTofu** >= 1.0
 - **AWS Provider** ~> 6.0
 - **Terragrunt** for environment management
-- **SSM Parameter Store** for secrets
+- **SSM Parameter Store** for secrets (Splunk admin password stored as SecureString)
 
 ## Commands
 
@@ -94,7 +94,7 @@ modules/
 
 **NEVER** commit passwords or credentials. Use:
 
-- `aws_ssm_parameter` for Splunk admin password
+- `aws_ssm_parameter` (SecureString) for Splunk admin password — retrieved at boot via `aws ssm get-parameter`
 - `aws-vault` for AWS credentials
 - Instance role + SSM for instance-level secrets
 
@@ -110,7 +110,8 @@ tofu test -no-color
 
 ## Security Notes
 
-- SSH disabled by default (`enable_ssh_access = false`)
+- SSH disabled by default (`ssh_allowed_cidrs = []` — empty list creates no SSH rule)
+- SSH access requires explicit CIDR allowlist via `ssh_allowed_cidrs` variable
 - Use SSM Session Manager for shell access (already installed on all instances)
 - All instances in private subnets except NAT
 - Splunk accessible only from within VPC

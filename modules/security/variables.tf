@@ -22,10 +22,16 @@ variable "private_subnet_cidrs" {
   default     = ["10.0.10.0/24", "10.0.20.0/24"]
 }
 
-variable "enable_ssh_access" {
-  description = "Whether to enable SSH access to instances"
-  type        = bool
-  default     = false
+variable "splunk_admin_password" {
+  description = "Admin password for Splunk (stored in SSM Parameter Store)"
+  type        = string
+  sensitive   = true
+}
+
+variable "ssh_allowed_cidrs" {
+  description = "CIDR blocks allowed SSH access to instances (port 22). Set to [] to disable SSH."
+  type        = list(string)
+  default     = []
 }
 
 variable "hec_allowed_cidrs" {

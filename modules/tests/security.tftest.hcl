@@ -48,32 +48,44 @@ run "security_plan_succeeds" {
   command = plan
 }
 
-# --- SSH disabled by default (no key pair provided) ---
-# When key_pair_name is null, the security module receives enable_ssh_access=false.
+# --- SSH disabled by default (ssh_allowed_cidrs defaults to empty) ---
+# When ssh_allowed_cidrs is [], no SSH ingress rule is created.
 # This is the default secure posture - use SSM Session Manager instead.
 
 run "ssh_disabled_by_default" {
   command = plan
 
   assert {
-    condition     = var.key_pair_name == null
-    error_message = "key_pair_name should default to null, which disables SSH access"
+    condition     = length(var.ssh_allowed_cidrs) == 0
+    error_message = "ssh_allowed_cidrs should default to [], disabling SSH access"
   }
 }
 
-# --- SSH can be enabled by providing a key pair name ---
-# When key_pair_name is set, main.tf sets enable_ssh_access = var.key_pair_name != null (true).
+# --- SSH can be enabled by providing explicit CIDRs ---
+# When ssh_allowed_cidrs is non-empty, the dynamic SSH ingress rule is created.
 
-run "ssh_enabled_when_key_pair_provided" {
+run "ssh_cidrs_controls_access" {
   command = plan
 
   variables {
-    key_pair_name = "my-ec2-keypair"
+    ssh_allowed_cidrs = ["10.0.0.0/8"]
   }
 
   assert {
-    condition     = var.key_pair_name != null
-    error_message = "key_pair_name should be non-null when provided, enabling SSH access"
+    condition     = length(var.ssh_allowed_cidrs) > 0
+    error_message = "ssh_allowed_cidrs should be non-empty when provided, enabling SSH access"
+  }
+}
+
+# --- SSM parameter is created for Splunk admin password ---
+# The security module stores the password as a SecureString SSM parameter.
+
+run "ssm_parameter_created_for_splunk_password" {
+  command = plan
+
+  assert {
+    condition     = var.splunk_admin_password != ""
+    error_message = "splunk_admin_password must be provided for SSM parameter creation"
   }
 }
 

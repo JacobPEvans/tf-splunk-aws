@@ -11,6 +11,9 @@ terraform {
   }
 }
 
+# Current AWS region (used in user_data for SSM parameter retrieval)
+data "aws_region" "current" {}
+
 # Local values for consistent tagging
 locals {
   common_tags = {
@@ -24,6 +27,7 @@ locals {
 locals {
   splunk_user_data = base64encode(<<-EOF
     #!/bin/bash
+    set -eo pipefail
     yum update -y
 
     # Install required packages
@@ -46,8 +50,22 @@ locals {
     tar -xzf splunk-${var.splunk_version}-${var.splunk_build}-Linux-x86_64.tgz
     chown -R splunk:splunk /opt/splunk
 
+    # Retrieve Splunk admin password from SSM Parameter Store (never stored in user_data)
+    SPLUNK_PASSWORD=$$(aws ssm get-parameter \
+      --name "${var.splunk_password_ssm_name}" \
+      --with-decryption \
+      --query 'Parameter.Value' \
+      --output text \
+      --region ${data.aws_region.current.id})
+
+    if [ -z "$$SPLUNK_PASSWORD" ]; then
+      echo "ERROR: Failed to retrieve Splunk password from SSM or password is empty. Aborting." >&2
+      exit 1
+    fi
+
     # Start Splunk and accept license
-    sudo -u splunk /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd "${var.splunk_admin_password}"
+    sudo -u splunk /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd "$$SPLUNK_PASSWORD"
+    unset SPLUNK_PASSWORD
 
     # Enable Splunk to start at boot
     /opt/splunk/bin/splunk enable boot-start -user splunk
@@ -68,7 +86,7 @@ resource "aws_instance" "splunk" {
   subnet_id              = var.private_subnet_ids[0] # Use first private subnet
   iam_instance_profile   = var.splunk_instance_profile_name
 
-  user_data = local.splunk_user_data
+  user_data_base64 = local.splunk_user_data
 
   root_block_device {
     volume_type = "gp3"

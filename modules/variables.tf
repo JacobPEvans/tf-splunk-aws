@@ -97,3 +97,16 @@ variable "hec_allowed_cidrs" {
   type        = list(string)
   default     = []
 }
+
+variable "ssh_allowed_cidrs" {
+  description = "CIDR blocks allowed SSH access to instances (port 22). Set to [] to disable SSH, or provide specific CIDRs."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for cidr in var.ssh_allowed_cidrs : can(cidrhost(cidr, 0))
+    ])
+    error_message = "Each ssh_allowed_cidrs entry must be a valid CIDR block, e.g. 203.0.113.0/24 or 0.0.0.0/0."
+  }
+}
