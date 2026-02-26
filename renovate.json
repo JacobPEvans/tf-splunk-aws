@@ -5,7 +5,7 @@
     {
       "description": "Tier 1: Automerge own and official GitHub Actions (all update types)",
       "matchManagers": ["github-actions"],
-      "matchPackagePrefixes": ["actions/", "jacobpevans/"],
+      "matchPackagePrefixes": ["actions/", "JacobPEvans/"],
       "automerge": true,
       "automergeType": "squash"
     },
