@@ -26,3 +26,8 @@ variable "public_subnet_ids" {
   description = "List of public subnet IDs"
   type        = list(string)
 }
+
+variable "ami_id" {
+  description = "AMI ID for the NAT instance"
+  type        = string
+}

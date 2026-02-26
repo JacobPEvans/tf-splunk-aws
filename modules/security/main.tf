@@ -96,6 +96,15 @@ resource "aws_security_group" "splunk" {
     cidr_blocks = var.vpc_cidr_blocks
   }
 
+  # Splunk HEC (8088)
+  ingress {
+    from_port   = 8088
+    to_port     = 8088
+    protocol    = "tcp"
+    cidr_blocks = var.hec_allowed_cidrs
+    description = "Splunk HEC (HTTP Event Collector)"
+  }
+
   # SSH access (optional, if key pair provided)
   dynamic "ingress" {
     for_each = var.enable_ssh_access ? [1] : []

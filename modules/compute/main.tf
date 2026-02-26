@@ -11,22 +11,6 @@ terraform {
   }
 }
 
-# Data source for Amazon Linux 2 AMI
-data "aws_ami" "amazon_linux" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
 # Local values for consistent tagging
 locals {
   common_tags = {
@@ -66,7 +50,7 @@ locals {
 
 # NAT Instance
 resource "aws_instance" "nat" {
-  ami                    = data.aws_ami.amazon_linux.id
+  ami                    = var.ami_id
   instance_type          = var.nat_instance_type
   key_name               = var.key_pair_name
   vpc_security_group_ids = [var.nat_security_group_id]

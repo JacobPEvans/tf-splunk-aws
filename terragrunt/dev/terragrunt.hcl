@@ -4,7 +4,7 @@ include "root" {
 }
 
 terraform {
-  source = "file://C:/git/tf-splunk-aws/modules"
+  source = "${get_parent_terragrunt_dir()}/../modules"
 }
 
 inputs = {

@@ -49,3 +49,20 @@ variable "splunk_instance_profile_name" {
   description = "IAM instance profile name for Splunk instance"
   type        = string
 }
+
+variable "ami_id" {
+  description = "AMI ID for the Splunk instance"
+  type        = string
+}
+
+variable "splunk_version" {
+  description = "Splunk Enterprise version to install"
+  type        = string
+  default     = "9.3.2"
+}
+
+variable "splunk_build" {
+  description = "Splunk Enterprise build hash for the download URL"
+  type        = string
+  default     = "d8bb32809498"
+}
