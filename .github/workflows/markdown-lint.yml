@@ -20,4 +20,3 @@ jobs:
         with:
           globs: '*.md modules/**/*.md .github/**/*.md'
           config: '.markdownlint.yml'
-          fix: true

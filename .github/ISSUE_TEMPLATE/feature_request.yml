@@ -1,0 +1,69 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature. Please fill out the details below.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the feature you'd like.
+      placeholder: Describe the feature...
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why is this feature needed? What problem does it solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or features you've considered?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Select the priority level for this feature
+      options:
+        - "priority:critical - Blocking, needs immediate attention"
+        - "priority:high - Significant impact, address soon"
+        - "priority:medium - Normal workflow"
+        - "priority:low - Minor issue, address when possible"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: size
+    attributes:
+      label: Size
+      description: Estimated effort to implement
+      options:
+        - "size:xs - Trivial change, under an hour"
+        - "size:s - Small change, a few hours"
+        - "size:m - Moderate effort, 1-2 days"
+        - "size:l - Large effort, 3-5 days"
+        - "size:xl - Very large, needs breakdown"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other context, mockups, or examples.
+    validations:
+      required: false

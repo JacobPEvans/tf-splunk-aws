@@ -30,20 +30,21 @@ NETWORK
   Private: 10.0.10.0/24, 10.0.20.0/24 (Splunk lives here)
 ```
 
-## Cost (~$17.67/mo with Graviton)
+## Cost (~$21.80/mo)
 
 | Resource | Instance | Cost |
 | -------- | -------- | ---- |
-| NAT | t4g.nano | ~$2.52/mo |
-| Splunk | t4g.small | ~$12.18/mo |
+| NAT | t3.nano | ~$3.80/mo |
+| Splunk | t3.small | ~$15.03/mo |
 | EBS (70GB gp3) | - | ~$2.97/mo |
 
+Graviton migration planned (see issue #23) — would reduce cost to ~$17.67/mo.
 Use scheduled scaling to stop Splunk off-hours for additional savings.
 
 ## Technology Stack
 
 - **Terraform/OpenTofu** >= 1.0
-- **AWS Provider** ~> 6.0
+- **AWS Provider** ~> 5.0
 - **Terragrunt** for environment management
 - **SSM Parameter Store** for secrets
 
@@ -116,11 +117,13 @@ tofu test -no-color
 
 ## Critical: Version Management
 
-**NEVER hardcode dependency versions unless explicitly requested.**
+Pin dependency versions for reproducibility. Use `~> X.Y` for patch-level flexibility
+while locking major/minor versions. This avoids unexpected breaking changes from upstream
+updates while still receiving bug fixes.
 
-- Always use latest stable versions (no pinning)
-- Let package managers resolve compatible versions
-- If version conflicts occur, investigate current ecosystem state
+- Use `~> X.Y` (e.g., `~> 5.0`) for provider versions — allows patch releases, locks major/minor
+- Use `>= X.Y` only when a minimum version is required and newer versions are all acceptable
+- Avoid overly tight constraints (e.g., `= X.Y.Z`) unless exact reproducibility is critical
 
 ## Development Workflow
 

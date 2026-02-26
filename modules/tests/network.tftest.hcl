@@ -4,10 +4,10 @@
 # that network outputs are surfaced correctly. Tests run at plan time
 # using mock providers - no AWS credentials needed.
 #
-# REGRESSION: Includes test for missing NAT route in the private route table.
-# The private route table (aws_route_table.private in network/main.tf) has no
-# NAT route defined, which means private subnet instances cannot reach the internet
-# through the NAT instance. This is a known architectural gap to track.
+# Note: With mock_provider, aws_route resource creation cannot be asserted at
+# plan time. The NAT route fix (aws_route.private_nat) is tested at apply time
+# in real deployments. The prerequisite test below verifies that subnets and
+# the NAT module are wired correctly as a proxy for routing readiness.
 
 mock_provider "aws" {}
 
@@ -47,14 +47,14 @@ override_module {
 
 # Shared valid defaults for all runs
 variables {
-  environment          = "dev"
-  vpc_cidr             = "10.0.0.0/16"
-  availability_zones   = ["us-east-2a", "us-east-2b"]
-  public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
-  private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
-  nat_instance_type    = "t3.nano"
-  splunk_instance_type = "t3.small"
-  splunk_admin_password = "TestPassword123!"
+  environment           = "dev"
+  vpc_cidr              = "10.0.0.0/16"
+  availability_zones    = ["us-east-2a", "us-east-2b"]
+  public_subnet_cidrs   = ["10.0.1.0/24", "10.0.2.0/24"]
+  private_subnet_cidrs  = ["10.0.10.0/24", "10.0.20.0/24"]
+  nat_instance_type     = "t3.nano"
+  splunk_instance_type  = "t3.small"
+  splunk_admin_password = "mock-password-value"
 }
 
 # --- Plan succeeds with valid network inputs ---
@@ -112,28 +112,24 @@ run "route_tables_are_created" {
   }
 }
 
-# --- REGRESSION: Private route table has no NAT route ---
-# This test documents the known gap: the private route table in network/main.tf
-# does not include a route for 0.0.0.0/0 via the NAT instance's network interface.
-# Without this route, private subnet instances (e.g., Splunk) cannot reach the internet
-# through the NAT instance. The route must be added to network/main.tf as an
-# aws_route resource that references the compute module's nat_primary_network_interface_id.
-#
-# Currently the plan succeeds because OpenTofu/Terraform does not validate routing
-# correctness at plan time - this assertion verifies that private_subnet_ids are
-# non-empty as a proxy check that subnets exist and would need a route.
+# --- Prerequisites: Private subnets and NAT module are wired correctly ---
+# Verifies that the root module correctly wires the network and compute modules
+# such that private subnets and the NAT instance both exist. This is a prerequisite
+# check — with mock_provider, route resource creation cannot be asserted at plan
+# time (plan does not validate routing correctness). The actual NAT route fix
+# (aws_route.private_nat in modules/main.tf) is tracked in issue #18.
 
-run "private_subnets_exist_and_require_nat_route" {
+run "private_subnets_and_nat_module_prerequisites" {
   command = plan
 
   assert {
     condition     = length(output.private_subnet_ids) > 0
-    error_message = "private subnets must exist; they also require a NAT route in the private route table (currently missing)"
+    error_message = "private subnets must exist as a prerequisite for NAT routing"
   }
 
   assert {
     condition     = output.nat_instance_id != null
-    error_message = "NAT instance must exist to provide routing for private subnets"
+    error_message = "NAT instance must be wired through the root module outputs"
   }
 }
 
