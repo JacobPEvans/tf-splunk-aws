@@ -19,7 +19,7 @@ Cost-optimized Splunk infrastructure using modular Terraform design. This docume
 ### Module Organization
 
 1. **Network Module** (`modules/network/`): VPC, subnets, routing, internet gateway
-2. **Security Module** (`modules/security/`): Security groups, IAM roles and policies  
+2. **Security Module** (`modules/security/`): Security groups, IAM roles and policies
 3. **Compute Module** (`modules/compute/`): NAT instance and basic compute resources
 4. **Splunk Module** (`modules/splunk/`): Splunk instance, EBS volumes, CloudWatch
 
@@ -84,7 +84,7 @@ VPC (10.0.0.0/16)
 ```hcl
 terragrunt/
 ├── dev/terragrunt.hcl     # Development environment
-├── stg/terragrunt.hcl     # Staging template  
+├── stg/terragrunt.hcl     # Staging template
 └── prod/terragrunt.hcl    # Production template
 ```
 
@@ -93,7 +93,7 @@ terragrunt/
 ```text
 modules/
 ├── main.tf               # Root module orchestrator
-├── variables.tf          # Root module variables  
+├── variables.tf          # Root module variables
 ├── outputs.tf            # Aggregated module outputs
 ├── network/              # Network infrastructure
 ├── security/             # Security groups & IAM

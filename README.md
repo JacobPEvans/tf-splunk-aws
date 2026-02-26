@@ -5,7 +5,7 @@ Cost-optimized Splunk infrastructure on AWS using Terraform and Terragrunt.
 
 ## What & Why
 
-**What**: Production-ready Splunk deployment on AWS with modular Terraform architecture  
+**What**: Production-ready Splunk deployment on AWS with modular Terraform architecture
 **Why**: Demonstrates cost optimization, infrastructure-as-code best practices, and security-first design
 
 ## Quick Facts

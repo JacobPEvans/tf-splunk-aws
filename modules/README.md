@@ -17,7 +17,7 @@ This directory contains modular Terraform configurations for deploying cost-opti
 Networking foundation:
 
 - VPC with DNS resolution enabled
-- Public/private subnets across multiple AZs  
+- Public/private subnets across multiple AZs
 - Internet Gateway for public connectivity
 - Route tables for traffic routing
 
@@ -49,7 +49,7 @@ Splunk infrastructure:
 ## Key Features
 
 - Cost-optimized NAT instance (saves ~$45/month vs NAT Gateway)
-- CloudWatch integration for monitoring  
+- CloudWatch integration for monitoring
 - Automated user data scripts
 - Proper security group configuration
 
@@ -78,7 +78,7 @@ terragrunt apply
 network (VPC, subnets, routing)
     ↓
 security (security groups, IAM)
-    ↓  
+    ↓
 compute (NAT instance)
     ↓
 splunk (Splunk instance + EBS)

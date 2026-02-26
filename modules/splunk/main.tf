@@ -41,33 +41,33 @@ locals {
   splunk_user_data = base64encode(<<-EOF
     #!/bin/bash
     yum update -y
-    
+
     # Install required packages
     yum install -y wget tar
-    
+
     # Install SSM agent (should be pre-installed on Amazon Linux 2)
     yum install -y amazon-ssm-agent
     systemctl enable amazon-ssm-agent
     systemctl start amazon-ssm-agent
-    
+
     # Install CloudWatch agent
     yum install -y amazon-cloudwatch-agent
-    
+
     # Create splunk user
     useradd -r -m -s /bin/bash splunk
-    
+
     # Download and install Splunk (using a basic installation)
     cd /opt
     wget -O splunk-8.2.6-a6fe1ee8894b-Linux-x86_64.tgz "https://download.splunk.com/products/splunk/releases/8.2.6/linux/splunk-8.2.6-a6fe1ee8894b-Linux-x86_64.tgz"
     tar -xzf splunk-8.2.6-a6fe1ee8894b-Linux-x86_64.tgz
     chown -R splunk:splunk /opt/splunk
-    
+
     # Start Splunk and accept license
     sudo -u splunk /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd "${var.splunk_admin_password}"
-    
+
     # Enable Splunk to start at boot
     /opt/splunk/bin/splunk enable boot-start -user splunk
-    
+
     # Configure basic settings
     sudo -u splunk /opt/splunk/bin/splunk set web-port 8000
     sudo -u splunk /opt/splunk/bin/splunk restart

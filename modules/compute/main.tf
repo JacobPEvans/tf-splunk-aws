@@ -44,20 +44,20 @@ locals {
     echo 'net.ipv4.ip_forward = 1' >> /etc/sysctl.conf
     echo 'net.ipv4.conf.eth0.send_redirects = 0' >> /etc/sysctl.conf
     sysctl -p /etc/sysctl.conf
-    
+
     # Configure iptables for NAT
     /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
     /sbin/iptables -F FORWARD
     /sbin/iptables -A FORWARD -j ACCEPT
-    
+
     # Save iptables rules
     service iptables save
-    
+
     # Install SSM agent (should be pre-installed on Amazon Linux 2)
     yum install -y amazon-ssm-agent
     systemctl enable amazon-ssm-agent
     systemctl start amazon-ssm-agent
-    
+
     # Install CloudWatch agent
     yum install -y amazon-cloudwatch-agent
   EOF
