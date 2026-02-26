@@ -1,0 +1,14 @@
+# Markdownlint configuration for tf-splunk-aws repository
+# See https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+
+# Default state for all rules
+default: true
+
+# Extend line length
+MD013:
+  line_length: 160
+  tables: false
+
+# Allow duplicate headers in CHANGELOG files (standard changelog format)
+MD024:
+  siblings_only: true
