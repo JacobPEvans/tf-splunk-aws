@@ -11,6 +11,22 @@ terraform {
   }
 }
 
+# Shared AMI data source - deduplicated from compute and splunk modules
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 # Network Module
 module "network" {
   source = "./network"
@@ -31,6 +47,7 @@ module "security" {
   vpc_cidr_blocks      = [module.network.vpc_cidr_block]
   private_subnet_cidrs = var.private_subnet_cidrs
   enable_ssh_access    = var.key_pair_name != null
+  hec_allowed_cidrs    = var.hec_allowed_cidrs
 }
 
 # Compute Module (NAT Instance)
@@ -42,6 +59,7 @@ module "compute" {
   key_pair_name         = var.key_pair_name
   nat_security_group_id = module.security.nat_security_group_id
   public_subnet_ids     = module.network.public_subnet_ids
+  ami_id                = data.aws_ami.amazon_linux.id
 }
 
 # Splunk Module
@@ -57,4 +75,16 @@ module "splunk" {
   splunk_security_group_id     = module.security.splunk_security_group_id
   private_subnet_ids           = module.network.private_subnet_ids
   splunk_instance_profile_name = module.security.splunk_instance_profile_name
+  ami_id                       = data.aws_ami.amazon_linux.id
+  splunk_version               = var.splunk_version
+  splunk_build                 = var.splunk_build
+}
+
+# Route private subnet traffic through NAT instance
+# This wires the compute module's NAT instance to the network module's private route table
+resource "aws_route" "private_nat" {
+  route_table_id         = module.network.private_route_table_id
+  destination_cidr_block = "0.0.0.0/0"
+  network_interface_id   = module.compute.nat_primary_network_interface_id
+
 }

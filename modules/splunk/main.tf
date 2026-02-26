@@ -11,22 +11,6 @@ terraform {
   }
 }
 
-# Data source for Amazon Linux 2 AMI
-data "aws_ami" "amazon_linux" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
 # Local values for consistent tagging
 locals {
   common_tags = {
@@ -58,8 +42,8 @@ locals {
 
     # Download and install Splunk (using a basic installation)
     cd /opt
-    wget -O splunk-8.2.6-a6fe1ee8894b-Linux-x86_64.tgz "https://download.splunk.com/products/splunk/releases/8.2.6/linux/splunk-8.2.6-a6fe1ee8894b-Linux-x86_64.tgz"
-    tar -xzf splunk-8.2.6-a6fe1ee8894b-Linux-x86_64.tgz
+    wget -O splunk-${var.splunk_version}-${var.splunk_build}-Linux-x86_64.tgz "https://download.splunk.com/products/splunk/releases/${var.splunk_version}/linux/splunk-${var.splunk_version}-${var.splunk_build}-Linux-x86_64.tgz"
+    tar -xzf splunk-${var.splunk_version}-${var.splunk_build}-Linux-x86_64.tgz
     chown -R splunk:splunk /opt/splunk
 
     # Start Splunk and accept license
@@ -77,7 +61,7 @@ locals {
 
 # Splunk Instance
 resource "aws_instance" "splunk" {
-  ami                    = data.aws_ami.amazon_linux.id
+  ami                    = var.ami_id
   instance_type          = var.splunk_instance_type
   key_name               = var.key_pair_name
   vpc_security_group_ids = [var.splunk_security_group_id]

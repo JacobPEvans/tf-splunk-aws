@@ -63,5 +63,37 @@ variable "splunk_admin_password" {
   description = "Admin password for Splunk (use strong password)"
   type        = string
   sensitive   = true
-  default     = "ChangeMe123!"
+
+  validation {
+    condition     = length(var.splunk_admin_password) >= 8
+    error_message = "Splunk admin password must be at least 8 characters."
+  }
+}
+
+variable "splunk_version" {
+  description = "Splunk Enterprise version to install"
+  type        = string
+  default     = "9.3.2"
+
+  validation {
+    condition     = can(regex("^[0-9]+\\.[0-9]+\\.[0-9]+$", var.splunk_version))
+    error_message = "Splunk version must be in X.Y.Z format (e.g., 9.3.2)."
+  }
+}
+
+variable "splunk_build" {
+  description = "Splunk Enterprise build hash for the download URL"
+  type        = string
+  default     = "d8bb32809498"
+
+  validation {
+    condition     = can(regex("^[a-f0-9]{12}$", var.splunk_build))
+    error_message = "Splunk build must be a 12-character hexadecimal string."
+  }
+}
+
+variable "hec_allowed_cidrs" {
+  description = "CIDR blocks allowed to send data to Splunk HEC (port 8088). Set to your on-prem/cloud source IPs."
+  type        = list(string)
+  default     = []
 }

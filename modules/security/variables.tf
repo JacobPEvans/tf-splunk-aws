@@ -27,3 +27,9 @@ variable "enable_ssh_access" {
   type        = bool
   default     = false
 }
+
+variable "hec_allowed_cidrs" {
+  description = "CIDR blocks allowed to send data to Splunk HEC (port 8088). Set to your on-prem/cloud source IPs."
+  type        = list(string)
+  default     = []
+}
