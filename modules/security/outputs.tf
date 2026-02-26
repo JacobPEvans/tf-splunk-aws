@@ -19,3 +19,8 @@ output "splunk_iam_role_arn" {
   description = "ARN of the Splunk IAM role"
   value       = aws_iam_role.splunk_instance.arn
 }
+
+output "splunk_password_ssm_name" {
+  description = "SSM Parameter Store name for Splunk admin password"
+  value       = aws_ssm_parameter.splunk_admin_password.name
+}

@@ -23,10 +23,9 @@ variable "splunk_data_volume_size" {
   default     = 50
 }
 
-variable "splunk_admin_password" {
-  description = "Admin password for Splunk (use strong password)"
+variable "splunk_password_ssm_name" {
+  description = "SSM Parameter Store name for the Splunk admin password"
   type        = string
-  sensitive   = true
 }
 
 variable "key_pair_name" {

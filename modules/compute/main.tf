@@ -57,7 +57,7 @@ resource "aws_instance" "nat" {
   subnet_id              = var.public_subnet_ids[0] # Use first public subnet
   source_dest_check      = false                    # Required for NAT functionality
 
-  user_data = local.nat_user_data
+  user_data_base64 = local.nat_user_data
 
   root_block_device {
     volume_type = "gp3"

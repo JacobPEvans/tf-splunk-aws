@@ -50,14 +50,15 @@ resource "aws_security_group" "nat_instance" {
     cidr_blocks = var.private_subnet_cidrs
   }
 
-  # SSH access (optional, if key pair provided)
+  # SSH access (restricted to explicit CIDRs — empty list disables SSH entirely)
   dynamic "ingress" {
-    for_each = var.enable_ssh_access ? [1] : []
+    for_each = length(var.ssh_allowed_cidrs) > 0 ? [1] : []
     content {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
+      cidr_blocks = var.ssh_allowed_cidrs
+      description = "SSH access (restricted)"
     }
   }
 
@@ -108,14 +109,15 @@ resource "aws_security_group" "splunk" {
     }
   }
 
-  # SSH access (optional, if key pair provided)
+  # SSH access (restricted to explicit CIDRs — empty list disables SSH entirely)
   dynamic "ingress" {
-    for_each = var.enable_ssh_access ? [1] : []
+    for_each = length(var.ssh_allowed_cidrs) > 0 ? [1] : []
     content {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
       cidr_blocks = var.vpc_cidr_blocks
+      description = "SSH from VPC (when SSH enabled)"
     }
   }
 
@@ -129,6 +131,18 @@ resource "aws_security_group" "splunk" {
 
   tags = merge(local.common_tags, {
     Name = "${var.environment}-splunk-sg"
+  })
+}
+
+# SSM Parameter Store - Splunk admin password (SecureString)
+resource "aws_ssm_parameter" "splunk_admin_password" {
+  name        = "/${var.environment}/splunk/admin-password"
+  description = "Splunk Enterprise admin password"
+  type        = "SecureString"
+  value       = var.splunk_admin_password
+
+  tags = merge(local.common_tags, {
+    Name = "${var.environment}-splunk-admin-password"
   })
 }
 
@@ -169,12 +183,18 @@ resource "aws_iam_role_policy" "splunk_instance" {
           "ssm:SendCommand",
           "ssm:ListCommands",
           "ssm:ListCommandInvocations",
-          "ssm:DescribeInstanceInformation",
+          "ssm:DescribeInstanceInformation"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "ssm:GetParameter",
           "ssm:GetParameters",
           "ssm:GetParametersByPath"
         ]
-        Resource = "*"
+        Resource = aws_ssm_parameter.splunk_admin_password.arn
       },
       {
         Effect = "Allow"

@@ -97,3 +97,9 @@ variable "hec_allowed_cidrs" {
   type        = list(string)
   default     = []
 }
+
+variable "ssh_allowed_cidrs" {
+  description = "CIDR blocks allowed SSH access to instances (port 22). Set to [] to disable SSH, or provide specific CIDRs."
+  type        = list(string)
+  default     = []
+}

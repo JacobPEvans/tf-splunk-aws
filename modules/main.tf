@@ -42,12 +42,13 @@ module "network" {
 module "security" {
   source = "./security"
 
-  environment          = var.environment
-  vpc_id               = module.network.vpc_id
-  vpc_cidr_blocks      = [module.network.vpc_cidr_block]
-  private_subnet_cidrs = var.private_subnet_cidrs
-  enable_ssh_access    = var.key_pair_name != null
-  hec_allowed_cidrs    = var.hec_allowed_cidrs
+  environment           = var.environment
+  vpc_id                = module.network.vpc_id
+  vpc_cidr_blocks       = [module.network.vpc_cidr_block]
+  private_subnet_cidrs  = var.private_subnet_cidrs
+  splunk_admin_password = var.splunk_admin_password
+  ssh_allowed_cidrs     = var.ssh_allowed_cidrs
+  hec_allowed_cidrs     = var.hec_allowed_cidrs
 }
 
 # Compute Module (NAT Instance)
@@ -70,7 +71,7 @@ module "splunk" {
   splunk_instance_type         = var.splunk_instance_type
   splunk_root_volume_size      = var.splunk_root_volume_size
   splunk_data_volume_size      = var.splunk_data_volume_size
-  splunk_admin_password        = var.splunk_admin_password
+  splunk_password_ssm_name     = module.security.splunk_password_ssm_name
   key_pair_name                = var.key_pair_name
   splunk_security_group_id     = module.security.splunk_security_group_id
   private_subnet_ids           = module.network.private_subnet_ids
