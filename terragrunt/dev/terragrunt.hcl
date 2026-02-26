@@ -23,6 +23,6 @@ inputs = {
   # Optional: Add your key pair name for SSH access
   # key_pair_name = "your-key-pair-name"
 
-  # Splunk configuration
-  splunk_admin_password = "SecurePassword123!"
+  # Set SPLUNK_ADMIN_PASSWORD env var before running (e.g., via aws-vault or doppler)
+  splunk_admin_password = get_env("SPLUNK_ADMIN_PASSWORD", "CHANGE_ME_USE_ENV_VAR")
 }

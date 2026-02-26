@@ -87,5 +87,4 @@ resource "aws_route" "private_nat" {
   destination_cidr_block = "0.0.0.0/0"
   network_interface_id   = module.compute.nat_primary_network_interface_id
 
-  depends_on = [module.compute, module.network]
 }
