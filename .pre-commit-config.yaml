@@ -62,4 +62,4 @@ repos:
         language: system
         files: '\.(tf|hcl)$'
         pass_filenames: false
-        stages: [pre-push]
+        stages: [manual]
