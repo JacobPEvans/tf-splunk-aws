@@ -32,16 +32,16 @@ NETWORK
 
 ## Cost
 
-| Resource | Always-On | With Auto-Lifecycle |
-| -------- | --------- | ------------------- |
+| Resource | Phase 1 (current) | Planned Phase 2+3 |
+| -------- | ----------------- | ----------------- |
 | NAT (t4g.nano) | ~$2.52/mo | ~$2.52/mo |
 | Splunk (t4g.small) | ~$12.18/mo | ~$3.05/mo (25% utilization) |
 | EBS (70GB gp3) | ~$2.97/mo | ~$2.97/mo |
-| S3 SmartStore | — | ~$0.50/mo |
+| S3 SmartStore (planned) | — | ~$0.50/mo |
 | **Total** | **~$17.67/mo** | **~$9/mo** |
 
-Auto-lifecycle (`enable_auto_lifecycle = true`) starts Splunk every 4 hours for 60 minutes.
-SmartStore persists all index data to S3 — searchable on-demand even when instance is stopped.
+Phase 2 will add S3 SmartStore bucket resources and SmartStore configuration.
+Phase 3 will add `enable_auto_lifecycle` toggle and EventBridge Scheduler.
 
 ## Technology Stack
 

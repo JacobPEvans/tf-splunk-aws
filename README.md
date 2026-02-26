@@ -1,7 +1,7 @@
 # TF-Splunk-AWS
 
 Cost-optimized Splunk infrastructure on AWS using Terraform and Terragrunt.
-**22 resources, ~$9–$17.67/month**.
+**22 resources, ~$17.67/month** (Phase 1); planned ~$9/month with Phase 2+3.
 
 ## What & Why
 
@@ -10,23 +10,23 @@ Cost-optimized Splunk infrastructure on AWS using Terraform and Terragrunt.
 
 ## Quick Facts
 
-- **Cost**: ~$9/month (lifecycle) or ~$17.67/month (always-on)
+- **Cost**: ~$17.67/month (Phase 1); ~$9/month with planned Phase 2+3
 - **Architecture**: 4 modules (network, security, compute, splunk)
 - **Deployment**: Terragrunt-managed with remote state
 - **Security**: Encrypted storage, IAM least privilege, VPC isolation
 
 ## Cost Breakdown
 
-| Resource | Always-On | With Auto-Lifecycle |
-| -------- | --------- | ------------------- |
+| Resource | Phase 1 (this PR) | Planned Phase 2+3 |
+| -------- | ----------------- | ----------------- |
 | NAT Instance (t4g.nano) | $2.52 | $2.52 |
 | Splunk Instance (t4g.small) | $12.18 | ~$3.05 (25% utilization) |
 | EBS Storage (70GB GP3) | $2.97 | $2.97 |
-| S3 SmartStore | — | ~$0.50 |
+| Planned S3 SmartStore | — | ~$0.50 |
 | **Total** | **~$17.67** | **~$9** |
 
-Auto-lifecycle starts Splunk every 4 hours for 60 minutes (6 hrs/day = 25% utilization).
-Data persists permanently in S3 via SmartStore and remains searchable on-demand.
+Phase 2 will add SmartStore-backed S3 data persistence.
+Phase 3 will add auto-lifecycle management (start every 4 hours for 60 minutes).
 
 ## Quick Start
 
