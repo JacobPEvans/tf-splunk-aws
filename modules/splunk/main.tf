@@ -27,6 +27,7 @@ locals {
 locals {
   splunk_user_data = base64encode(<<-EOF
     #!/bin/bash
+    set -eo pipefail
     yum update -y
 
     # Install required packages
@@ -56,6 +57,11 @@ locals {
       --query 'Parameter.Value' \
       --output text \
       --region ${data.aws_region.current.id})
+
+    if [ -z "$$SPLUNK_PASSWORD" ]; then
+      echo "ERROR: Failed to retrieve Splunk password from SSM or password is empty. Aborting." >&2
+      exit 1
+    fi
 
     # Start Splunk and accept license
     sudo -u splunk /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd "$$SPLUNK_PASSWORD"

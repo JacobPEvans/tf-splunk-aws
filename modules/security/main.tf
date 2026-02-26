@@ -116,8 +116,8 @@ resource "aws_security_group" "splunk" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_blocks = var.vpc_cidr_blocks
-      description = "SSH from VPC (when SSH enabled)"
+      cidr_blocks = var.ssh_allowed_cidrs
+      description = "SSH from allowed CIDRs (when SSH enabled)"
     }
   }
 
@@ -191,10 +191,14 @@ resource "aws_iam_role_policy" "splunk_instance" {
         Effect = "Allow"
         Action = [
           "ssm:GetParameter",
-          "ssm:GetParameters",
-          "ssm:GetParametersByPath"
+          "ssm:GetParameters"
         ]
         Resource = aws_ssm_parameter.splunk_admin_password.arn
+      },
+      {
+        Effect   = "Allow"
+        Action   = "kms:Decrypt"
+        Resource = "*"
       },
       {
         Effect = "Allow"
