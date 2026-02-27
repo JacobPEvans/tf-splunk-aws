@@ -11,6 +11,9 @@ terraform {
   }
 }
 
+# AWS account identity - used for unique S3 bucket naming
+data "aws_caller_identity" "current" {}
+
 # Shared AMI data source - deduplicated from compute and splunk modules
 data "aws_ami" "amazon_linux" {
   most_recent = true
@@ -24,6 +27,65 @@ data "aws_ami" "amazon_linux" {
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
+  }
+}
+
+# SmartStore S3 Bucket - remote storage for Splunk warm/cold index buckets
+# Created at root level to break circular dependency: security needs ARN for IAM, splunk needs name for config
+resource "aws_s3_bucket" "smartstore" {
+  bucket = "${var.environment}-splunk-smartstore-${data.aws_caller_identity.current.account_id}"
+
+  tags = {
+    Environment = var.environment
+    Project     = "splunk-aws"
+    ManagedBy   = "terraform"
+    Name        = "${var.environment}-splunk-smartstore"
+  }
+}
+
+resource "aws_s3_bucket_versioning" "smartstore" {
+  bucket = aws_s3_bucket.smartstore.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "smartstore" {
+  bucket = aws_s3_bucket.smartstore.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "smartstore" {
+  bucket = aws_s3_bucket.smartstore.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "smartstore" {
+  bucket = aws_s3_bucket.smartstore.id
+
+  rule {
+    id     = "smartstore-tiering"
+    status = "Enabled"
+
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 90
+      storage_class = "GLACIER"
+    }
   }
 }
 
@@ -49,6 +111,7 @@ module "security" {
   splunk_admin_password = var.splunk_admin_password
   ssh_allowed_cidrs     = var.ssh_allowed_cidrs
   hec_allowed_cidrs     = var.hec_allowed_cidrs
+  smartstore_bucket_arn = aws_s3_bucket.smartstore.arn
 }
 
 # Compute Module (NAT Instance)
@@ -79,6 +142,10 @@ module "splunk" {
   ami_id                       = data.aws_ami.amazon_linux.id
   splunk_version               = var.splunk_version
   splunk_build                 = var.splunk_build
+  smartstore_bucket_name       = aws_s3_bucket.smartstore.bucket
+  enable_auto_lifecycle        = var.enable_auto_lifecycle
+  auto_shutdown_minutes        = var.auto_shutdown_minutes
+  lifecycle_interval_hours     = var.lifecycle_interval_hours
 }
 
 # Route private subnet traffic through NAT instance

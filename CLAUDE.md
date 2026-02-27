@@ -24,6 +24,10 @@ DATA FLOW
   On-Prem Splunk -> HEC (port 8088) -> AWS Splunk Receiver (private subnet via NAT)
   Cloud Sources  -> HEC (port 8088) -> AWS Splunk Receiver
 
+SmartStore (S3 remote index storage)
+  Splunk warm/cold index buckets -> S3 bucket (see Terraform outputs)
+  Data persists in S3 even when instance is stopped — searchable on-demand via start
+
 NETWORK
   VPC: 10.0.0.0/16
   Public:  10.0.1.0/24, 10.0.2.0/24 (NAT instance lives here)
@@ -32,16 +36,17 @@ NETWORK
 
 ## Cost
 
-| Resource | Phase 1 (current) | Planned Phase 2+3 |
-| -------- | ----------------- | ----------------- |
+| Resource | Always-On | Auto-Lifecycle |
+| -------- | --------- | -------------- |
 | NAT (t4g.nano) | ~$2.52/mo | ~$2.52/mo |
 | Splunk (t4g.small) | ~$12.18/mo | ~$3.05/mo (25% utilization) |
 | EBS (70GB gp3) | ~$2.97/mo | ~$2.97/mo |
-| S3 SmartStore (planned) | — | ~$0.50/mo |
-| **Total** | **~$17.67/mo** | **~$9/mo** |
+| S3 SmartStore | ~$0.50/mo | ~$0.50/mo |
+| **Total** | **~$18.17/mo** | **~$9/mo** |
 
-Phase 2 will add S3 SmartStore bucket resources and SmartStore configuration.
-Phase 3 will add `enable_auto_lifecycle` toggle and EventBridge Scheduler.
+SmartStore is live: warm/cold index buckets tier to S3-IA (30d) then Glacier (90d).
+Auto-lifecycle (`enable_auto_lifecycle = true`) starts Splunk every 4 hours for 60 minutes via EventBridge Scheduler.
+Data persists in S3 even when instance is stopped — searchable on-demand via start.
 
 ## Technology Stack
 

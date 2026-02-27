@@ -110,3 +110,21 @@ variable "ssh_allowed_cidrs" {
     error_message = "Each ssh_allowed_cidrs entry must be a valid CIDR block, e.g. 203.0.113.0/24 or 0.0.0.0/0."
   }
 }
+
+variable "enable_auto_lifecycle" {
+  description = "Enable automatic start/stop lifecycle for Splunk instance. EventBridge starts Splunk on a schedule; per-boot script stops it after auto_shutdown_minutes."
+  type        = bool
+  default     = false
+}
+
+variable "auto_shutdown_minutes" {
+  description = "Minutes after boot before Splunk auto-shuts down (requires enable_auto_lifecycle = true). Default 60 = 1 hour per start."
+  type        = number
+  default     = 60
+}
+
+variable "lifecycle_interval_hours" {
+  description = "Hours between automatic Splunk starts via EventBridge Scheduler (requires enable_auto_lifecycle = true). Default 4 = 6 starts/day."
+  type        = number
+  default     = 4
+}

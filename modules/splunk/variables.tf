@@ -75,3 +75,26 @@ variable "splunk_build" {
     error_message = "Splunk build must be a 12-character hexadecimal string."
   }
 }
+
+variable "smartstore_bucket_name" {
+  description = "Name of the S3 bucket used for Splunk SmartStore remote storage"
+  type        = string
+}
+
+variable "enable_auto_lifecycle" {
+  description = "Enable automatic start/stop lifecycle for Splunk instance"
+  type        = bool
+  default     = false
+}
+
+variable "auto_shutdown_minutes" {
+  description = "Minutes after boot before Splunk auto-shuts down (requires enable_auto_lifecycle = true)"
+  type        = number
+  default     = 60
+}
+
+variable "lifecycle_interval_hours" {
+  description = "Hours between automatic Splunk starts via EventBridge Scheduler (requires enable_auto_lifecycle = true)"
+  type        = number
+  default     = 4
+}

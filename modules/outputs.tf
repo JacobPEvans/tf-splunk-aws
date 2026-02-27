@@ -65,10 +65,16 @@ output "splunk_web_url" {
   value       = module.splunk.splunk_web_url
 }
 
+# SmartStore S3 Bucket
+output "smartstore_bucket_name" {
+  description = "Name of the S3 bucket used for Splunk SmartStore remote storage"
+  value       = aws_s3_bucket.smartstore.bucket
+}
+
 # Cost Estimation
 output "estimated_monthly_cost" {
-  description = "Estimated monthly cost in USD"
-  value       = "~$17.67/mo (t4g.nano NAT: $2.52, t4g.small Splunk: $12.18, EBS: $2.97)"
+  description = "Estimated monthly cost in USD (always-on vs auto-lifecycle)"
+  value       = "Always-on: ~$18.17/mo (NAT: $2.52, Splunk: $12.18, EBS: $2.97, S3: ~$0.50) | Auto-lifecycle: ~$9/mo (Splunk 25%: ~$3.05)"
 }
 
 # Access Information

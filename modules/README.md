@@ -1,6 +1,7 @@
 # Terraform Modules for Splunk AWS Infrastructure
 
-This directory contains modular Terraform configurations for deploying cost-optimized Splunk infrastructure on AWS. The modules follow separation of concerns principles and AWS best practices.
+This directory contains modular Terraform configurations for deploying cost-optimized Splunk infrastructure on AWS.
+The modules follow separation of concerns principles and AWS best practices.
 
 ## 📁 Module Structure
 
@@ -33,7 +34,7 @@ Security and access management:
 
 Cost-optimized compute resources:
 
-- t3.nano NAT instance (replaces expensive NAT Gateway)
+- t4g.nano NAT instance (Graviton ARM64) — replaces expensive NAT Gateway
 - CloudWatch log groups for monitoring
 - User data scripts for NAT functionality
 
@@ -41,7 +42,7 @@ Cost-optimized compute resources:
 
 Splunk infrastructure:
 
-- t3.small Splunk instance
+- t4g.small Splunk instance (Graviton ARM64)
 - Encrypted EBS volumes for data storage
 - CloudWatch integration for logging
 - User data scripts for Splunk setup
@@ -105,7 +106,8 @@ terragrunt plan
 terragrunt apply
 ```
 
-**IMPORTANT**: Always use Terragrunt commands, never direct Terraform. All infrastructure management is handled through Terragrunt for proper state management and environment isolation.
+**IMPORTANT**: Always use Terragrunt commands, never direct Terraform. All infrastructure management is handled
+through Terragrunt for proper state management and environment isolation.
 
 ## 📞 Support
 
@@ -118,4 +120,5 @@ For questions or issues:
 
 ---
 
-*This infrastructure follows AWS Well-Architected Framework principles and is designed for production workloads with appropriate security, monitoring, and cost optimization.*
+*This infrastructure follows AWS Well-Architected Framework principles and is designed for production workloads
+with appropriate security, monitoring, and cost optimization.*
