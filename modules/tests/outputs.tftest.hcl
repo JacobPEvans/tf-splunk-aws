@@ -182,3 +182,15 @@ run "nat_instance_outputs_are_present" {
     error_message = "nat_instance_private_ip output must be non-null"
   }
 }
+
+# --- SmartStore S3 bucket name is exposed ---
+# The smartstore_bucket_name output must be present for Ansible/ops to configure S3 access.
+
+run "smartstore_bucket_name_is_non_null" {
+  command = plan
+
+  assert {
+    condition     = output.smartstore_bucket_name != null
+    error_message = "smartstore_bucket_name output must be non-null"
+  }
+}

@@ -21,6 +21,8 @@ locals {
     Project     = "splunk-aws"
     ManagedBy   = "terraform"
   }
+  # rate() requires singular "hour" for value 1, plural "hours" for all others
+  lifecycle_schedule_unit = var.lifecycle_interval_hours == 1 ? "hour" : "hours"
 }
 
 # User data script for Splunk instance
@@ -54,6 +56,29 @@ locals {
     tar -xzf "$${SPLUNK_PKG}"
     chown -R splunk:splunk /opt/splunk
 
+    # Configure SmartStore (S3 remote storage for warm/cold buckets)
+    # Must run before first Splunk start so indexes are created with SmartStore enabled
+    mkdir -p /opt/splunk/etc/system/local
+
+    cat > /opt/splunk/etc/system/local/indexes.conf << 'INDEXES'
+[volume:s3_store]
+storageType = remote
+path = s3://${var.smartstore_bucket_name}/smartstore
+
+[default]
+remotePath = volume:s3_store/$$_index_name
+repFactor = 0
+maxDataSize = auto
+INDEXES
+
+    cat > /opt/splunk/etc/system/local/server.conf << 'SERVER'
+[cachemanager]
+max_cache_size = 5120
+eviction_policy = lru
+SERVER
+
+    chown -R splunk:splunk /opt/splunk/etc/system/local
+
     # Retrieve Splunk admin password from SSM Parameter Store (never stored in user_data)
     SPLUNK_PASSWORD=$$(aws ssm get-parameter \
       --name "${var.splunk_password_ssm_name}" \
@@ -77,6 +102,20 @@ locals {
     # Configure basic settings
     sudo -u splunk /opt/splunk/bin/splunk set web-port 8000
     sudo -u splunk /opt/splunk/bin/splunk restart
+    %{if var.enable_auto_lifecycle}
+
+    # Auto-lifecycle: schedule shutdown ${var.auto_shutdown_minutes} minutes after every boot.
+    # cloud-init per-boot scripts run on every instance start (first boot and subsequent restarts).
+    mkdir -p /var/lib/cloud/scripts/per-boot
+    cat > /var/lib/cloud/scripts/per-boot/auto-shutdown.sh << 'SHUTDOWN'
+#!/bin/bash
+# Guard: only shut down if Splunk is installed (skip first-boot provisioning run).
+if [ -f /opt/splunk/bin/splunk ]; then
+  /sbin/shutdown -h +${var.auto_shutdown_minutes}
+fi
+SHUTDOWN
+    chmod +x /var/lib/cloud/scripts/per-boot/auto-shutdown.sh
+    %{endif}
   EOF
   )
 }
@@ -142,4 +181,63 @@ resource "aws_cloudwatch_log_group" "splunk_app" {
   tags = merge(local.common_tags, {
     Name = "${var.environment}-splunk-app-logs"
   })
+}
+
+# Auto-lifecycle: EventBridge Scheduler starts Splunk on a recurring schedule.
+# Per-boot script (in user_data above) shuts it down after auto_shutdown_minutes.
+# All resources below are only created when enable_auto_lifecycle = true.
+
+resource "aws_iam_role" "lifecycle_scheduler" {
+  count = var.enable_auto_lifecycle ? 1 : 0
+
+  name = "${var.environment}-splunk-lifecycle-scheduler"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "scheduler.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+
+  tags = local.common_tags
+}
+
+resource "aws_iam_role_policy" "lifecycle_scheduler" {
+  count = var.enable_auto_lifecycle ? 1 : 0
+
+  name = "${var.environment}-splunk-lifecycle-scheduler"
+  role = aws_iam_role.lifecycle_scheduler[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["ec2:StartInstances"]
+      Resource = "arn:aws:ec2:*:*:instance/${aws_instance.splunk.id}"
+    }]
+  })
+}
+
+resource "aws_scheduler_schedule" "splunk_start" {
+  count = var.enable_auto_lifecycle ? 1 : 0
+
+  name        = "${var.environment}-splunk-start"
+  description = "Start Splunk every ${var.lifecycle_interval_hours} hours for data indexing"
+
+  flexible_time_window {
+    mode = "OFF"
+  }
+
+  schedule_expression = "rate(${var.lifecycle_interval_hours} ${local.lifecycle_schedule_unit})"
+
+  target {
+    arn      = "arn:aws:scheduler:::aws-sdk:ec2:startInstances"
+    role_arn = aws_iam_role.lifecycle_scheduler[0].arn
+
+    input = jsonencode({
+      InstanceIds = [aws_instance.splunk.id]
+    })
+  }
 }

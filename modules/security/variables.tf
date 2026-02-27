@@ -39,3 +39,8 @@ variable "hec_allowed_cidrs" {
   type        = list(string)
   default     = []
 }
+
+variable "smartstore_bucket_arn" {
+  description = "ARN of the S3 bucket used for Splunk SmartStore remote storage"
+  type        = string
+}
