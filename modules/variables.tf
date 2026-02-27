@@ -121,10 +121,24 @@ variable "auto_shutdown_minutes" {
   description = "Minutes after boot before Splunk auto-shuts down (requires enable_auto_lifecycle = true). Default 60 = 1 hour per start."
   type        = number
   default     = 60
+
+  validation {
+    condition = (
+      var.auto_shutdown_minutes >= 1 &&
+      floor(var.auto_shutdown_minutes) == var.auto_shutdown_minutes &&
+      var.auto_shutdown_minutes <= 10080
+    )
+    error_message = "auto_shutdown_minutes must be an integer between 1 and 10080 (7 days)."
+  }
 }
 
 variable "lifecycle_interval_hours" {
   description = "Hours between automatic Splunk starts via EventBridge Scheduler (requires enable_auto_lifecycle = true). Default 4 = 6 starts/day."
   type        = number
   default     = 4
+
+  validation {
+    condition     = var.lifecycle_interval_hours >= 1 && floor(var.lifecycle_interval_hours) == var.lifecycle_interval_hours
+    error_message = "lifecycle_interval_hours must be an integer greater than or equal to 1."
+  }
 }

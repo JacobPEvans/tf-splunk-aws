@@ -21,6 +21,8 @@ locals {
     Project     = "splunk-aws"
     ManagedBy   = "terraform"
   }
+  # rate() requires singular "hour" for value 1, plural "hours" for all others
+  lifecycle_schedule_unit = var.lifecycle_interval_hours == 1 ? "hour" : "hours"
 }
 
 # User data script for Splunk instance
@@ -228,7 +230,7 @@ resource "aws_scheduler_schedule" "splunk_start" {
     mode = "OFF"
   }
 
-  schedule_expression = "rate(${var.lifecycle_interval_hours} hours)"
+  schedule_expression = "rate(${var.lifecycle_interval_hours} ${local.lifecycle_schedule_unit})"
 
   target {
     arn      = "arn:aws:scheduler:::aws-sdk:ec2:startInstances"

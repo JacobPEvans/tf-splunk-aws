@@ -84,7 +84,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "smartstore" {
 
     transition {
       days          = 90
-      storage_class = "GLACIER"
+      storage_class = "GLACIER_IR"
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = 90
     }
   }
 }
