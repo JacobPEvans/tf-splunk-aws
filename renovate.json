@@ -1,36 +1,17 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": [
+    "config:recommended",
+    "local>JacobPEvans/.github:renovate-presets"
+  ],
   "packageRules": [
-    {
-      "description": "Tier 1: Automerge own and official GitHub Actions (all update types)",
-      "matchManagers": ["github-actions"],
-      "matchPackagePrefixes": ["actions/", "JacobPEvans/"],
-      "automerge": true,
-      "automergeType": "squash"
-    },
-    {
-      "description": "Tier 2: Automerge minor/patch from vetted well-known publishers",
-      "matchManagers": ["github-actions"],
-      "matchPackagePrefixes": ["aquasecurity/", "googleapis/"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true,
-      "automergeType": "squash"
-    },
-    {
-      "description": "Automerge pre-commit minor and patch updates",
-      "matchManagers": ["pre-commit"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true,
-      "automergeType": "squash"
-    },
     {
       "description": "Automerge tflint-ruleset minor and patch updates (terraform-linters is canonical tflint org)",
       "matchManagers": ["terraform", "tflint"],
       "matchPackagePrefixes": ["terraform-linters/"],
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true,
-      "automergeType": "squash"
+      "automergeType": "pr"
     }
   ]
 }
