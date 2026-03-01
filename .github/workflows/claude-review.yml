@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   review:
-    uses: JacobPEvans/ai-workflows/.github/workflows/claude-review.yml@v0.6.0
+    uses: JacobPEvans/ai-workflows/.github/workflows/claude-review.yml@v0.6.1
     with:
       review_prompt: "Focus on AWS Terraform best practices, IAM security, VPC architecture, cost optimization, and Splunk DR patterns"
       max_reviews: "1"
