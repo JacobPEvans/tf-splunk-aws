@@ -18,12 +18,19 @@ All commands must be wrapped with aws-vault and Doppler:
 aws-vault exec terraform -- doppler run -- terragrunt <COMMAND>
 ```
 
+> Note: `terraform` in `aws-vault exec terraform` is an **aws-vault profile name**, not the
+> Terraform binary. The IaC binary used in this repo is `tofu` (OpenTofu).
+
 For plan/apply:
 
 ```bash
 aws-vault exec terraform -- doppler run -- terragrunt plan
 aws-vault exec terraform -- doppler run -- terragrunt apply
 ```
+
+> Note: Terragrunt uses OpenTofu automatically because `tofu` is on `PATH` (installed via
+> `opentofu/setup-opentofu@v1` in CI, or `opentofu` via Nix locally). No `TERRAGRUNT_TFPATH`
+> override is needed — Terragrunt detects `tofu` and prefers it over `terraform`.
 
 ## Technology Stack
 
