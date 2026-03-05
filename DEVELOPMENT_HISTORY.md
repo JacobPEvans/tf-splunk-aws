@@ -22,7 +22,7 @@ This document provides historical context on how the tf-splunk-aws project evolv
 
 ### Major Achievement
 
-Cost optimization from ~$97/month to ~$21.80/month (77% reduction) through architectural decisions like using NAT instances instead of NAT Gateways.
+Cost optimization from ~$97/month to ~$18.17/month always-on (81% reduction) through architectural decisions like using NAT instances instead of NAT Gateways.
 
 ---
 
