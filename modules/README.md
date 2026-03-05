@@ -73,6 +73,8 @@ terragrunt plan
 
 # Review the plan output, then apply
 terragrunt apply
+```
+
 ### Module Dependencies
 
 ```text
@@ -88,7 +90,7 @@ splunk (Splunk instance + EBS)
 ## 📋 Requirements
 
 - **Terraform**: >= 1.0
-- **AWS Provider**: ~> 5.0
+- **AWS Provider**: ~> 6.0
 - **AWS CLI**: Configured with appropriate permissions
 - **Terragrunt**: Required for deployment
 
