@@ -51,7 +51,7 @@ VPC (10.0.0.0/16)
 
 #### NAT Instance (Cost Optimized)
 
-- **Type**: `t4g.nano` (~$3.02/month)
+- **Type**: `t4g.nano` (~$2.52/month)
 - **AMI**: Amazon Linux 2 (data source)
 - **Purpose**: Replace expensive NAT Gateways (~$45/month each)
 - **Location**: Public subnet with source/destination check disabled
@@ -125,10 +125,10 @@ modules/
 
 ### Current Status
 
-- **Resources**: 22 to be created
-- **Status**: Ready for deployment (plan successful)
-- **Infrastructure**: Exists only in planning state
-- **Next Step**: Awaiting approval for `terragrunt apply`
+- **Resources**: 22 AWS resources
+- **Status**: Deployed via `terragrunt apply`
+- **Infrastructure**: Managed in remote state (S3 + DynamoDB)
+- **Next Step**: Use `terragrunt plan` before any changes
 
 ## Key Outputs
 
