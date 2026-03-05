@@ -66,4 +66,4 @@ Standard AWS Splunk deployments using NAT Gateways cost ~$97/month for basic inf
 
 ---
 
-Last Updated: June 3, 2025
+Last Updated: March 5, 2026
