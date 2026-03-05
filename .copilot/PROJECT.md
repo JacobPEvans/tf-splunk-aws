@@ -2,9 +2,9 @@
 
 ## Overview
 
-Cost-optimized Splunk infrastructure on AWS demonstrating 77% cost reduction through architectural optimization. Uses modular Terraform with Terragrunt for infrastructure-as-code best practices.
+Cost-optimized Splunk infrastructure on AWS demonstrating 81% cost reduction through architectural optimization. Uses modular Terraform with Terragrunt for infrastructure-as-code best practices.
 
-**Key Achievement**: Reduced monthly costs from ~$97 to ~$21.80 by replacing NAT Gateways with cost-optimized NAT instances.
+**Key Achievement**: Reduced monthly costs from ~$97 to ~$18.17/month (always-on) or ~$9/month (with auto-lifecycle) by replacing NAT Gateways with cost-optimized NAT instances.
 
 ## Business Value
 
@@ -14,7 +14,7 @@ Standard AWS Splunk deployments using NAT Gateways cost ~$97/month for basic inf
 
 ### Solution Approach
 
-- **Cost Optimization**: t3.nano NAT instance instead of NAT Gateway (~92% savings)
+- **Cost Optimization**: t4g.nano NAT instance instead of NAT Gateway (~92% savings)
 - **Modular Design**: 4 focused modules for maintainability and reusability
 - **Infrastructure as Code**: Terragrunt-managed Terraform with remote state
 - **Security First**: VPC isolation, encrypted storage, least privilege access
@@ -24,7 +24,7 @@ Standard AWS Splunk deployments using NAT Gateways cost ~$97/month for basic inf
 ### Cost Targets
 
 - **Maximum Budget**: $25/month
-- **Current Cost**: ~$21.80/month
+- **Current Cost**: ~$18.17/month always-on (~$9/month with `enable_auto_lifecycle = true`)
 - **Cost Analysis Required**: For any new resources
 
 ### Technical Boundaries
@@ -59,7 +59,7 @@ Standard AWS Splunk deployments using NAT Gateways cost ~$97/month for basic inf
 
 ## Success Metrics
 
-1. **Cost Optimization**: 77% reduction achieved ($97 → $21.80/month)
+1. **Cost Optimization**: 81% reduction achieved ($97 → $18.17/month always-on)
 2. **Modular Architecture**: 4 focused modules implemented
 3. **Code Quality**: DRY principles, proper separation of concerns
 4. **Deployment Ready**: 22 resources validated via `terragrunt plan`
