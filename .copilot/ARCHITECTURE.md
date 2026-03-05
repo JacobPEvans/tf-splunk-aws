@@ -43,8 +43,8 @@ VPC (10.0.0.0/16)
 │   ├── us-east-2a: 10.0.1.0/24
 │   └── us-east-2b: 10.0.2.0/24
 └── Private Subnets
-    ├── us-east-2a: 10.0.3.0/24
-    └── us-east-2b: 10.0.4.0/24
+    ├── us-east-2a: 10.0.10.0/24
+    └── us-east-2b: 10.0.20.0/24
 ```
 
 ### Compute Resources
@@ -58,8 +58,8 @@ VPC (10.0.0.0/16)
 
 #### Splunk Instance
 
-- **Type**: `t3.small` (~$15.18/month)
-- **Storage**: 20GB GP3 encrypted (~$1.60/month)
+- **Type**: `t4g.small` (~$12.18/month)
+- **Storage**: 70GB GP3 encrypted (~$2.97/month) — 20GB root + 50GB data volume
 - **AMI**: Amazon Linux 2 (data source)
 - **Location**: Private subnet
 
@@ -117,7 +117,7 @@ modules/
 
 ### Instance Sizing
 
-- **Decision**: t4g.nano for NAT, t3.small for Splunk
+- **Decision**: t4g.nano for NAT, t4g.small for Splunk
 - **Rationale**: Minimum viable sizing for cost optimization
 - **Monitoring**: CloudWatch for performance validation
 
