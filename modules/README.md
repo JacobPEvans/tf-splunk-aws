@@ -108,8 +108,8 @@ terragrunt plan
 terragrunt apply
 ```
 
-**IMPORTANT**: Always use Terragrunt commands, never direct Terraform. All infrastructure management is handled
-through Terragrunt for proper state management and environment isolation.
+**IMPORTANT**: For deployment, always use Terragrunt commands for proper state management and environment isolation.
+Direct `tofu` commands are supported for local testing without credentials (e.g. `tofu init -backend=false && tofu validate && tofu test`).
 
 ## 📞 Support
 
