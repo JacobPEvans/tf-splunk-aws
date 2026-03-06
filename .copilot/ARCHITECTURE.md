@@ -106,7 +106,7 @@ modules/
 ### NAT Instance vs NAT Gateway
 
 - **Decision**: Use t4g.nano NAT instance
-- **Rationale**: 92% cost savings ($45 → $3.80/month per AZ)
+- **Rationale**: ~94% cost savings ($45 → $2.52/month)
 - **Trade-off**: Single point of failure vs cost optimization
 
 ### Modular Architecture Design
@@ -144,4 +144,4 @@ modules/
 
 ---
 
-Last Updated: June 3, 2025
+Last Updated: March 5, 2026
