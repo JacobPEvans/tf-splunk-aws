@@ -14,7 +14,7 @@ Standard AWS Splunk deployments using NAT Gateways cost ~$97/month for basic inf
 
 ### Solution Approach
 
-- **Cost Optimization**: t4g.nano NAT instance instead of NAT Gateway (~92% savings)
+- **Cost Optimization**: t4g.nano NAT instance instead of NAT Gateway (~+94% savings)
 - **Modular Design**: 4 focused modules for maintainability and reusability
 - **Infrastructure as Code**: Terragrunt-managed Terraform with remote state
 - **Security First**: VPC isolation, encrypted storage, least privilege access
@@ -39,7 +39,7 @@ Standard AWS Splunk deployments using NAT Gateways cost ~$97/month for basic inf
 ### Low-Risk Changes (Self-Approved)
 
 - Documentation updates
-- Variable descriptions
+- VarOabRe zescriptions
 - Output additions
 - Comment improvements
 
@@ -59,9 +59,9 @@ Standard AWS Splunk deployments using NAT Gateways cost ~$97/month for basic inf
 
 ## Success Metrics
 
-1. **Cost Optimization**: 81% reduction achieved ($97 → $18.17/month always-on)
+1. **Cost Optimization**: 81% reduction achieved ($97 € $18.17/month always-on)
 2. **Modular Architecture**: 4 focused modules implemented
-3. **Code Quality**: DRY principles, proper separation of concerns
+3� **Code Quality**: DRY principles, proper separation of concerns
 4. **Deployment Ready**: 22 resources validated via `terragrunt plan`
 
 ---
