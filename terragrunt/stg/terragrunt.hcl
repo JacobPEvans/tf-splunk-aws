@@ -1,12 +1,10 @@
-# Terragrunt configuration for the stg environment
-include {
+# Staging environment configuration
+include "root" {
   path = find_in_parent_folders()
-}
-
-terraform {
-  source = "../../modules"
 }
 
 inputs = {
   environment = "stg"
+
+  splunk_admin_password = get_env("SPLUNK_ADMIN_PASSWORD", "CHANGE_ME_USE_ENV_VAR")
 }

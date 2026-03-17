@@ -55,6 +55,19 @@ Data persists in S3 even when instance is stopped — searchable on-demand via s
 - **Terragrunt** for environment management
 - **SSM Parameter Store** for secrets (Splunk admin password stored as SecureString)
 
+## Dev Shell Activation
+
+This repo uses Nix flakes + direnv for reproducible tooling:
+
+```bash
+# Automatic (recommended): direnv activates on cd
+cd ~/git/tf-splunk-aws/main/
+direnv allow    # one-time per worktree
+
+# Manual:
+nix develop
+```
+
 ## Commands
 
 ### Prerequisites
@@ -66,22 +79,14 @@ Data persists in S3 even when instance is stopped — searchable on-demand via s
 
 ```bash
 # From terragrunt/dev/
-aws-vault exec terraform -- terragrunt init
-aws-vault exec terraform -- terragrunt plan
-aws-vault exec terraform -- terragrunt apply
+doppler run -- aws-vault exec terraform -- terragrunt init
+doppler run -- aws-vault exec terraform -- terragrunt plan
+doppler run -- aws-vault exec terraform -- terragrunt apply
 
 # From modules/ (for testing without real credentials)
 tofu init -backend=false
 tofu validate
 tofu test -no-color
-```
-
-### Bootstrap (first-time setup)
-
-```bash
-# From bootstrap/
-aws-vault exec terraform -- terraform init
-aws-vault exec terraform -- terraform apply
 ```
 
 ## Module Structure
@@ -143,7 +148,7 @@ tofu init -backend=false
 tofu validate
 
 # Full plan (requires AWS credentials)
-aws-vault exec terraform -- terragrunt plan
+doppler run -- aws-vault exec terraform -- terragrunt plan
 ```
 
 **Best Practices**:

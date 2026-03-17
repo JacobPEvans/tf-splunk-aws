@@ -14,7 +14,14 @@ remote_state {
   }
 }
 
-# Updated module paths to match the new structure
 terraform {
-  source = "../modules"
+  source = "./modules"
+
+  extra_arguments "retry" {
+    commands  = get_terraform_commands_that_need_vars()
+    arguments = ["-lock-timeout=5m"]
+  }
 }
+
+terragrunt_version_constraint = ">= 0.45"
+terraform_version_constraint  = ">= 1.0"
