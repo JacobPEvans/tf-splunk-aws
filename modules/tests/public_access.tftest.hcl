@@ -1,7 +1,10 @@
 # Tests for public access configuration
 #
-# Verifies that splunk_public_access controls subnet placement and public IP
-# assignment. Tests both default (private) and enabled (public) modes.
+# Verifies that splunk_public_access and web_allowed_cidrs variables have correct
+# defaults and that the root module plans successfully under both private and public
+# configurations. Uses mock providers — does not test runtime attribute values or
+# module-internal logic (e.g., subnet selection, coalesce). Those require apply-time
+# integration tests with real AWS credentials.
 # All runs use mock providers - no AWS credentials needed.
 
 mock_provider "aws" {}
