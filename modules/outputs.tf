@@ -60,8 +60,13 @@ output "splunk_instance_private_ip" {
   value       = module.splunk.splunk_instance_private_ip
 }
 
+output "splunk_instance_public_ip" {
+  description = "Public IP address of the Splunk instance (null when in private subnet)"
+  value       = module.splunk.splunk_instance_public_ip
+}
+
 output "splunk_web_url" {
-  description = "URL for Splunk Web interface (internal)"
+  description = "URL for Splunk Web interface (uses public IP when available)"
   value       = module.splunk.splunk_web_url
 }
 
@@ -81,8 +86,9 @@ output "estimated_monthly_cost" {
 output "connection_info" {
   description = "Connection information for accessing the infrastructure"
   value = {
-    splunk_web_url = module.splunk.splunk_web_url
-    vpc_id         = module.network.vpc_id
-    nat_instance   = module.compute.nat_instance_public_ip
+    splunk_web_url       = module.splunk.splunk_web_url
+    splunk_public_ip     = module.splunk.splunk_instance_public_ip
+    vpc_id               = module.network.vpc_id
+    nat_instance         = module.compute.nat_instance_public_ip
   }
 }

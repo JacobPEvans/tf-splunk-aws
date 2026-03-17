@@ -115,6 +115,7 @@ module "security" {
   splunk_admin_password = var.splunk_admin_password
   ssh_allowed_cidrs     = var.ssh_allowed_cidrs
   hec_allowed_cidrs     = var.hec_allowed_cidrs
+  web_allowed_cidrs     = var.web_allowed_cidrs
   smartstore_bucket_arn = aws_s3_bucket.smartstore.arn
 }
 
@@ -141,7 +142,8 @@ module "splunk" {
   splunk_password_ssm_name     = module.security.splunk_password_ssm_name
   key_pair_name                = var.key_pair_name
   splunk_security_group_id     = module.security.splunk_security_group_id
-  private_subnet_ids           = module.network.private_subnet_ids
+  subnet_ids                   = var.splunk_public_access ? module.network.public_subnet_ids : module.network.private_subnet_ids
+  associate_public_ip_address  = var.splunk_public_access
   splunk_instance_profile_name = module.security.splunk_instance_profile_name
   ami_id                       = data.aws_ami.amazon_linux.id
   splunk_version               = var.splunk_version
