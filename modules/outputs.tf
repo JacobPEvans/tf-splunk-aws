@@ -86,9 +86,9 @@ output "estimated_monthly_cost" {
 output "connection_info" {
   description = "Connection information for accessing the infrastructure"
   value = {
-    splunk_web_url       = module.splunk.splunk_web_url
-    splunk_public_ip     = module.splunk.splunk_instance_public_ip
-    vpc_id               = module.network.vpc_id
-    nat_instance         = module.compute.nat_instance_public_ip
+    splunk_web_url   = module.splunk.splunk_web_url
+    splunk_public_ip = module.splunk.splunk_instance_public_ip
+    vpc_id           = module.network.vpc_id
+    nat_instance     = module.compute.nat_instance_public_ip
   }
 }
