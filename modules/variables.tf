@@ -99,7 +99,7 @@ variable "splunk_public_access" {
 }
 
 variable "web_allowed_cidrs" {
-  description = "CIDR blocks allowed access to Splunk Web (port 8000) from the internet. Only effective when splunk_public_access = true."
+  description = "CIDR blocks allowed access to Splunk Web (port 8000). Creates a security group rule whenever non-empty, regardless of splunk_public_access. Useful for VPN/peering access to private instances."
   type        = list(string)
   default     = []
 }
