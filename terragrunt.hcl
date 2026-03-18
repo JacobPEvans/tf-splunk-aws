@@ -18,7 +18,7 @@ terraform {
   source = "./modules"
 
   extra_arguments "retry" {
-    commands  = get_terraform_commands_that_need_vars()
+    commands  = get_terraform_commands_that_need_locking()
     arguments = ["-lock-timeout=5m"]
   }
 }
