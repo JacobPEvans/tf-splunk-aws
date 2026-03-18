@@ -15,17 +15,17 @@ The binary is `tofu`. All HCL is OpenTofu-compatible.
 All commands must be wrapped with aws-vault and Doppler:
 
 ```bash
-aws-vault exec terraform -- doppler run -- terragrunt <COMMAND>
+aws-vault exec tf-splunk-aws -- doppler run -- terragrunt <COMMAND>
 ```
 
-> Note: `terraform` in `aws-vault exec terraform` is an **aws-vault profile name**, not the
+> Note: `tf-splunk-aws` in `aws-vault exec tf-splunk-aws` is an **aws-vault profile name**, not the
 > Terraform binary. The IaC binary used in this repo is `tofu` (OpenTofu).
 
 For plan/apply:
 
 ```bash
-aws-vault exec terraform -- doppler run -- terragrunt plan
-aws-vault exec terraform -- doppler run -- terragrunt apply
+aws-vault exec tf-splunk-aws -- doppler run -- terragrunt plan
+aws-vault exec tf-splunk-aws -- doppler run -- terragrunt apply
 ```
 
 > Note: Terragrunt uses OpenTofu automatically because `tofu` is on `PATH` (installed via

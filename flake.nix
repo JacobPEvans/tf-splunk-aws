@@ -83,7 +83,7 @@
                 echo "Getting Started:"
                 echo "  1. Setup pre-commit: pre-commit install"
                 echo "  2. Plan (requires aws-vault + Doppler):"
-                echo "     aws-vault exec terraform -- doppler run -- terragrunt plan"
+                echo "     aws-vault exec tf-splunk-aws -- doppler run -- terragrunt plan"
                 echo ""
               fi
             '';
