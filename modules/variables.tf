@@ -45,6 +45,11 @@ variable "splunk_instance_type" {
   description = "Instance type for Splunk instance (must be x86_64 — Splunk Enterprise has no public ARM64 release)"
   type        = string
   default     = "t3a.small"
+
+  validation {
+    condition     = !can(regex("(^a1\\.|[0-9]g\\.)", var.splunk_instance_type))
+    error_message = "splunk_instance_type must be x86_64. ARM/Graviton families (e.g., t4g.*, c6g.*, m6g.*, a1.*) are not supported — Splunk Enterprise has no public ARM64 release."
+  }
 }
 
 variable "splunk_root_volume_size" {
