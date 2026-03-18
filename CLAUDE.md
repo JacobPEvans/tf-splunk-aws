@@ -55,6 +55,19 @@ Data persists in S3 even when instance is stopped — searchable on-demand via s
 - **Terragrunt** for environment management
 - **SSM Parameter Store** for secrets (Splunk admin password stored as SecureString)
 
+## Dev Shell Activation
+
+This repo uses Nix flakes + direnv for reproducible tooling:
+
+```bash
+# Automatic (recommended): direnv activates on cd
+cd ~/git/tf-splunk-aws/main/
+direnv allow    # one-time per worktree
+
+# Manual:
+nix develop
+```
+
 ## Commands
 
 ### Prerequisites
@@ -62,26 +75,50 @@ Data persists in S3 even when instance is stopped — searchable on-demand via s
 - `aws-vault` for AWS credential management
 - `doppler` for environment variable injection (if using Doppler secrets)
 
+### Remote State Bootstrap (first-time / new AWS account)
+
+The S3 bucket and DynamoDB table for Terragrunt remote state must exist before running
+`terragrunt init`. They are created manually once per account:
+
+```bash
+# Create S3 bucket (deterministic name — no random suffix)
+aws-vault exec terraform -- aws s3api create-bucket \
+  --bucket tf-splunk-aws-state-useast2-$(aws-vault exec terraform -- aws sts get-caller-identity --query Account --output text) \
+  --region us-east-2 \
+  --create-bucket-configuration LocationConstraint=us-east-2
+
+# Enable versioning and encryption
+aws-vault exec terraform -- aws s3api put-bucket-versioning \
+  --bucket tf-splunk-aws-state-useast2-<ACCOUNT_ID> \
+  --versioning-configuration Status=Enabled
+
+aws-vault exec terraform -- aws s3api put-bucket-encryption \
+  --bucket tf-splunk-aws-state-useast2-<ACCOUNT_ID> \
+  --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
+
+# Create DynamoDB table for state locking
+aws-vault exec terraform -- aws dynamodb create-table \
+  --table-name tf-splunk-aws-locks-useast2 \
+  --attribute-definitions AttributeName=LockID,AttributeType=S \
+  --key-schema AttributeName=LockID,KeyType=HASH \
+  --billing-mode PAY_PER_REQUEST \
+  --region us-east-2
+```
+
+Once these resources exist, `terragrunt init` will succeed and manage the state backend automatically.
+
 ### Terraform Operations
 
 ```bash
 # From terragrunt/dev/
-aws-vault exec terraform -- terragrunt init
-aws-vault exec terraform -- terragrunt plan
-aws-vault exec terraform -- terragrunt apply
+aws-vault exec terraform -- doppler run -- terragrunt init
+aws-vault exec terraform -- doppler run -- terragrunt plan
+aws-vault exec terraform -- doppler run -- terragrunt apply
 
 # From modules/ (for testing without real credentials)
 tofu init -backend=false
 tofu validate
 tofu test -no-color
-```
-
-### Bootstrap (first-time setup)
-
-```bash
-# From bootstrap/
-aws-vault exec terraform -- terraform init
-aws-vault exec terraform -- terraform apply
 ```
 
 ## Module Structure
@@ -143,7 +180,7 @@ tofu init -backend=false
 tofu validate
 
 # Full plan (requires AWS credentials)
-aws-vault exec terraform -- terragrunt plan
+aws-vault exec terraform -- doppler run -- terragrunt plan
 ```
 
 **Best Practices**:
