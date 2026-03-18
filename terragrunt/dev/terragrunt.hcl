@@ -22,6 +22,11 @@ inputs = {
   # SSH access: set to specific CIDRs to enable, empty list disables SSH entirely
   ssh_allowed_cidrs = []
 
+  # Public access: place Splunk in public subnet with public IP
+  # splunk_public_access = true
+  # web_allowed_cidrs    = ["YOUR.IP/32"]
+  # hec_allowed_cidrs    = ["YOUR.IP/32"]
+
   # Set SPLUNK_ADMIN_PASSWORD env var before running via Doppler (see Commands section)
   # Empty default intentionally fails the >= 8 char validation when env var is not set
   splunk_admin_password = get_env("SPLUNK_ADMIN_PASSWORD", "")

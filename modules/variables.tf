@@ -92,6 +92,18 @@ variable "splunk_build" {
   }
 }
 
+variable "splunk_public_access" {
+  description = "Place Splunk in a public subnet with a public IP. When true, Splunk gets a public IP and sits in the public subnet."
+  type        = bool
+  default     = false
+}
+
+variable "web_allowed_cidrs" {
+  description = "CIDR blocks allowed access to Splunk Web (port 8000). Creates a security group rule whenever non-empty, regardless of splunk_public_access. Useful for VPN/peering access to private instances."
+  type        = list(string)
+  default     = []
+}
+
 variable "hec_allowed_cidrs" {
   description = "CIDR blocks allowed to send data to Splunk HEC (port 8088). Set to your on-prem/cloud source IPs."
   type        = list(string)
