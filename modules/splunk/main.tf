@@ -48,7 +48,7 @@ locals {
 
     # Download and install Splunk
     cd /opt
-    SPLUNK_PKG="splunk-${var.splunk_version}-${var.splunk_build}-Linux-aarch64.tgz"
+    SPLUNK_PKG="splunk-${var.splunk_version}-${var.splunk_build}-linux-amd64.tgz"
     SPLUNK_BASE_URL="https://download.splunk.com/products/splunk/releases/${var.splunk_version}/linux"
     wget -O "$${SPLUNK_PKG}" "$${SPLUNK_BASE_URL}/$${SPLUNK_PKG}"
     wget -O "$${SPLUNK_PKG}.sha512" "$${SPLUNK_BASE_URL}/$${SPLUNK_PKG}.sha512"

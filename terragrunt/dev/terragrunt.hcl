@@ -17,7 +17,7 @@ inputs = {
 
   # Instance sizing
   nat_instance_type       = "t4g.nano"
-  splunk_instance_type    = "t4g.small"
+  splunk_instance_type    = "t3a.small"
   splunk_root_volume_size = 20
   splunk_data_volume_size = 50
 
