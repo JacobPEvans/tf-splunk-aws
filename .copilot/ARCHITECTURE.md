@@ -61,7 +61,7 @@ VPC (10.0.0.0/16)
 - **Type**: `t4g.small` (~$12.18/month)
 - **Storage**: 70GB GP3 encrypted (~$2.97/month) — 20GB root + 50GB data volume
 - **AMI**: Amazon Linux 2 (data source)
-- **Location**: Private subnet
+- **Location**: Private subnet by default; optionally placed in a public subnet via `associate_public_ip_address = true`
 
 ### Security Configuration
 
