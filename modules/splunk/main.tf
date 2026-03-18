@@ -66,7 +66,7 @@ storageType = remote
 path = s3://${var.smartstore_bucket_name}/smartstore
 
 [default]
-remotePath = volume:s3_store/$$_index_name
+remotePath = volume:s3_store/$_index_name
 repFactor = 0
 maxDataSize = auto
 INDEXES
@@ -80,20 +80,20 @@ SERVER
     chown -R splunk:splunk /opt/splunk/etc/system/local
 
     # Retrieve Splunk admin password from SSM Parameter Store (never stored in user_data)
-    SPLUNK_PASSWORD=$$(aws ssm get-parameter \
+    SPLUNK_PASSWORD=$(aws ssm get-parameter \
       --name "${var.splunk_password_ssm_name}" \
       --with-decryption \
       --query 'Parameter.Value' \
       --output text \
       --region ${data.aws_region.current.id})
 
-    if [ -z "$$SPLUNK_PASSWORD" ]; then
+    if [ -z "$SPLUNK_PASSWORD" ]; then
       echo "ERROR: Failed to retrieve Splunk password from SSM or password is empty. Aborting." >&2
       exit 1
     fi
 
     # Start Splunk and accept license
-    sudo -u splunk /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd "$$SPLUNK_PASSWORD"
+    sudo -u splunk /opt/splunk/bin/splunk start --accept-license --answer-yes --no-prompt --seed-passwd "$SPLUNK_PASSWORD"
     unset SPLUNK_PASSWORD
 
     # Enable Splunk to start at boot
