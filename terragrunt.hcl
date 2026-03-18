@@ -15,7 +15,7 @@ remote_state {
 }
 
 terraform {
-  source = "./modules"
+  source = "${get_repo_root()}/modules"
 
   extra_arguments "retry" {
     commands  = get_terraform_commands_that_need_locking()

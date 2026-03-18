@@ -50,7 +50,7 @@ repos:
 
       - id: terragrunt-validate
         name: terragrunt validate
-        entry: bash -c 'aws-vault exec terraform -- terragrunt validate'
+        entry: bash -c 'aws-vault exec tf-splunk-aws -- terragrunt validate'
         language: system
         files: '\.(tf|hcl)$'
         pass_filenames: false
@@ -58,7 +58,7 @@ repos:
 
       - id: terragrunt-plan
         name: terragrunt plan
-        entry: bash -c 'aws-vault exec terraform -- terragrunt plan -detailed-exitcode; rc=$?; if [ $rc -eq 0 ] || [ $rc -eq 2 ]; then exit 0; else exit 1; fi'
+        entry: bash -c 'aws-vault exec tf-splunk-aws -- terragrunt plan -detailed-exitcode; rc=$?; if [ $rc -eq 0 ] || [ $rc -eq 2 ]; then exit 0; else exit 1; fi'
         language: system
         files: '\.(tf|hcl)$'
         pass_filenames: false

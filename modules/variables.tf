@@ -110,6 +110,12 @@ variable "hec_allowed_cidrs" {
   default     = []
 }
 
+variable "allow_all_ips" {
+  description = "Override web_allowed_cidrs and hec_allowed_cidrs to 0.0.0.0/0. Must be set via CLI (TF_VAR_allow_all_ips=true) — never committed in terragrunt config."
+  type        = bool
+  default     = false
+}
+
 variable "ssh_allowed_cidrs" {
   description = "CIDR blocks allowed SSH access to instances (port 22). Set to [] to disable SSH, or provide specific CIDRs."
   type        = list(string)

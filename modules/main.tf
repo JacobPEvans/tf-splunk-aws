@@ -116,6 +116,7 @@ module "security" {
   ssh_allowed_cidrs     = var.ssh_allowed_cidrs
   hec_allowed_cidrs     = var.hec_allowed_cidrs
   web_allowed_cidrs     = var.web_allowed_cidrs
+  allow_all_ips         = var.allow_all_ips
   smartstore_bucket_arn = aws_s3_bucket.smartstore.arn
 }
 

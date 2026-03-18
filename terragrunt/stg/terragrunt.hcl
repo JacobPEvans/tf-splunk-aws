@@ -7,5 +7,5 @@ inputs = {
   environment = "stg"
 
   # Empty default intentionally fails the >= 8 char validation when env var is not set
-  splunk_admin_password = get_env("SPLUNK_ADMIN_PASSWORD", "")
+  splunk_admin_password = get_env("SPLUNK_PASSWORD", "")
 }

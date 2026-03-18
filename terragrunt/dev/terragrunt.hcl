@@ -3,6 +3,11 @@ include "root" {
   path = find_in_parent_folders()
 }
 
+locals {
+  network_public_ip = get_env("NETWORK_PUBLIC_IP_ADDRESS", "")
+  allowed_cidrs     = local.network_public_ip != "" ? ["${local.network_public_ip}/32"] : []
+}
+
 inputs = {
   environment          = "dev"
   vpc_cidr             = "10.0.0.0/16"
@@ -23,11 +28,14 @@ inputs = {
   ssh_allowed_cidrs = []
 
   # Public access: place Splunk in public subnet with public IP
-  # splunk_public_access = true
-  # web_allowed_cidrs    = ["YOUR.IP/32"]
-  # hec_allowed_cidrs    = ["YOUR.IP/32"]
+  splunk_public_access = true
 
-  # Set SPLUNK_ADMIN_PASSWORD env var before running via Doppler (see Commands section)
+  # CIDRs from Doppler NETWORK_PUBLIC_IP_ADDRESS (iac-conf-mgmt/prd)
+  # Never commit real IPs — empty default disables external access if env var unset
+  web_allowed_cidrs = local.allowed_cidrs
+  hec_allowed_cidrs = local.allowed_cidrs
+
+  # Splunk admin password from Doppler SPLUNK_PASSWORD (iac-conf-mgmt/prd)
   # Empty default intentionally fails the >= 8 char validation when env var is not set
-  splunk_admin_password = get_env("SPLUNK_ADMIN_PASSWORD", "")
+  splunk_admin_password = get_env("SPLUNK_PASSWORD", "")
 }
