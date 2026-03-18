@@ -39,9 +39,15 @@ variable "splunk_security_group_id" {
   type        = string
 }
 
-variable "private_subnet_ids" {
-  description = "List of private subnet IDs"
+variable "subnet_ids" {
+  description = "List of subnet IDs for Splunk instance placement"
   type        = list(string)
+}
+
+variable "associate_public_ip_address" {
+  description = "Whether to associate a public IP address with the Splunk instance"
+  type        = bool
+  default     = false
 }
 
 variable "splunk_instance_profile_name" {

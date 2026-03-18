@@ -24,6 +24,7 @@ override_module {
   outputs = {
     splunk_instance_id          = "i-00000000000000002"
     splunk_instance_private_ip  = "10.0.10.20"
+    splunk_instance_public_ip   = null
     splunk_web_url              = "http://10.0.10.20:8000"
     splunk_cloudwatch_log_group = "/aws/ec2/splunk"
     splunk_app_log_group        = "/aws/ec2/splunk/app"

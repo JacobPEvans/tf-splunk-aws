@@ -40,6 +40,12 @@ variable "hec_allowed_cidrs" {
   default     = []
 }
 
+variable "web_allowed_cidrs" {
+  description = "CIDR blocks allowed access to Splunk Web (port 8000) from the internet. Set to [] to restrict to VPC only."
+  type        = list(string)
+  default     = []
+}
+
 variable "smartstore_bucket_arn" {
   description = "ARN of the S3 bucket used for Splunk SmartStore remote storage"
   type        = string
