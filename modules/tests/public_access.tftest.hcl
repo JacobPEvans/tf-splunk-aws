@@ -52,7 +52,7 @@ variables {
   public_subnet_cidrs   = ["10.0.1.0/24", "10.0.2.0/24"]
   private_subnet_cidrs  = ["10.0.10.0/24", "10.0.20.0/24"]
   nat_instance_type     = "t4g.nano"
-  splunk_instance_type  = "t4g.small"
+  splunk_instance_type  = "t3a.small"
   splunk_admin_password = "mock-password-value"
 }
 
