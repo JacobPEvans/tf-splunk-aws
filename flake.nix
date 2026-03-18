@@ -81,9 +81,9 @@
                 echo "  - aws-cli: $(aws --version 2>/dev/null)"
                 echo ""
                 echo "Getting Started:"
-                echo "  1. Configure AWS credentials: aws configure or aws-vault"
-                echo "  2. Initialize: cd terragrunt/dev && terragrunt init"
-                echo "  3. Setup pre-commit: pre-commit install"
+                echo "  1. Setup pre-commit: pre-commit install"
+                echo "  2. Plan (requires aws-vault + Doppler):"
+                echo "     aws-vault exec terraform -- doppler run -- terragrunt plan"
                 echo ""
               fi
             '';
