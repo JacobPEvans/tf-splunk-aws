@@ -3,6 +3,11 @@ include "root" {
   path = find_in_parent_folders()
 }
 
+locals {
+  network_public_ip = get_env("NETWORK_PUBLIC_IP_ADDRESS", "")
+  allowed_cidrs     = local.network_public_ip != "" ? ["${local.network_public_ip}/32"] : []
+}
+
 inputs = {
   environment          = "dev"
   vpc_cidr             = "10.0.0.0/16"
@@ -27,8 +32,8 @@ inputs = {
 
   # CIDRs from Doppler NETWORK_PUBLIC_IP_ADDRESS (iac-conf-mgmt/prd)
   # Never commit real IPs — empty default disables external access if env var unset
-  web_allowed_cidrs = get_env("NETWORK_PUBLIC_IP_ADDRESS", "") != "" ? ["${get_env("NETWORK_PUBLIC_IP_ADDRESS")}/32"] : []
-  hec_allowed_cidrs = get_env("NETWORK_PUBLIC_IP_ADDRESS", "") != "" ? ["${get_env("NETWORK_PUBLIC_IP_ADDRESS")}/32"] : []
+  web_allowed_cidrs = local.allowed_cidrs
+  hec_allowed_cidrs = local.allowed_cidrs
 
   # Splunk admin password from Doppler SPLUNK_PASSWORD (iac-conf-mgmt/prd)
   # Empty default intentionally fails the >= 8 char validation when env var is not set
