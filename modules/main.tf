@@ -14,7 +14,7 @@ terraform {
 # AWS account identity - used for unique S3 bucket naming
 data "aws_caller_identity" "current" {}
 
-# Shared AMI data source - deduplicated from compute and splunk modules
+# ARM64 AMI for NAT instance (t4g.nano — Graviton)
 data "aws_ami" "amazon_linux" {
   most_recent = true
   owners      = ["amazon"]
@@ -22,6 +22,22 @@ data "aws_ami" "amazon_linux" {
   filter {
     name   = "name"
     values = ["amzn2-ami-hvm-*-arm64-gp2"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+# x86_64 AMI for Splunk instance — Splunk Enterprise has no public ARM64 release
+data "aws_ami" "amazon_linux_x86" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
   }
 
   filter {
@@ -146,7 +162,7 @@ module "splunk" {
   subnet_ids                   = var.splunk_public_access ? module.network.public_subnet_ids : module.network.private_subnet_ids
   associate_public_ip_address  = var.splunk_public_access
   splunk_instance_profile_name = module.security.splunk_instance_profile_name
-  ami_id                       = data.aws_ami.amazon_linux.id
+  ami_id                       = data.aws_ami.amazon_linux_x86.id
   splunk_version               = var.splunk_version
   splunk_build                 = var.splunk_build
   smartstore_bucket_name       = aws_s3_bucket.smartstore.bucket

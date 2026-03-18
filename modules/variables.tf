@@ -42,9 +42,9 @@ variable "nat_instance_type" {
 }
 
 variable "splunk_instance_type" {
-  description = "Instance type for Splunk instance"
+  description = "Instance type for Splunk instance (must be x86_64 — Splunk Enterprise has no public ARM64 release)"
   type        = string
-  default     = "t4g.small"
+  default     = "t3a.small"
 }
 
 variable "splunk_root_volume_size" {
@@ -73,18 +73,18 @@ variable "splunk_admin_password" {
 variable "splunk_version" {
   description = "Splunk Enterprise version to install"
   type        = string
-  default     = "9.3.2"
+  default     = "9.4.9"
 
   validation {
     condition     = can(regex("^[0-9]+\\.[0-9]+\\.[0-9]+$", var.splunk_version))
-    error_message = "Splunk version must be in X.Y.Z format (e.g., 9.3.2)."
+    error_message = "Splunk version must be in X.Y.Z format (e.g., 9.4.9)."
   }
 }
 
 variable "splunk_build" {
   description = "Splunk Enterprise build hash for the download URL"
   type        = string
-  default     = "d8bb32809498"
+  default     = "03bb451d4e07"
 
   validation {
     condition     = can(regex("^[a-f0-9]{12}$", var.splunk_build))
