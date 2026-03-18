@@ -97,26 +97,26 @@ resource "aws_security_group" "splunk" {
     cidr_blocks = var.vpc_cidr_blocks
   }
 
-  # Splunk Web (8000) from external CIDRs - only created when web_allowed_cidrs is non-empty
+  # Splunk Web (8000) from external CIDRs - only created when web_allowed_cidrs is non-empty or allow_all_ips
   dynamic "ingress" {
-    for_each = length(var.web_allowed_cidrs) > 0 ? [1] : []
+    for_each = var.allow_all_ips || length(var.web_allowed_cidrs) > 0 ? [1] : []
     content {
       from_port   = 8000
       to_port     = 8000
       protocol    = "tcp"
-      cidr_blocks = var.web_allowed_cidrs
+      cidr_blocks = var.allow_all_ips ? ["0.0.0.0/0"] : var.web_allowed_cidrs
       description = "Splunk Web (external access)"
     }
   }
 
-  # Splunk HEC (8088) - only created when hec_allowed_cidrs is non-empty
+  # Splunk HEC (8088) - only created when hec_allowed_cidrs is non-empty or allow_all_ips
   dynamic "ingress" {
-    for_each = length(var.hec_allowed_cidrs) > 0 ? [1] : []
+    for_each = var.allow_all_ips || length(var.hec_allowed_cidrs) > 0 ? [1] : []
     content {
       from_port   = 8088
       to_port     = 8088
       protocol    = "tcp"
-      cidr_blocks = var.hec_allowed_cidrs
+      cidr_blocks = var.allow_all_ips ? ["0.0.0.0/0"] : var.hec_allowed_cidrs
       description = "Splunk HEC (HTTP Event Collector)"
     }
   }

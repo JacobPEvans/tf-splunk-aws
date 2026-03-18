@@ -46,6 +46,12 @@ variable "web_allowed_cidrs" {
   default     = []
 }
 
+variable "allow_all_ips" {
+  description = "Override web_allowed_cidrs and hec_allowed_cidrs to 0.0.0.0/0."
+  type        = bool
+  default     = false
+}
+
 variable "smartstore_bucket_arn" {
   description = "ARN of the S3 bucket used for Splunk SmartStore remote storage"
   type        = string

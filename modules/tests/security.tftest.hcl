@@ -133,3 +133,31 @@ run "nat_and_splunk_security_groups_are_separate" {
     error_message = "NAT and Splunk must have separate security groups for least-privilege access control"
   }
 }
+
+# --- allow_all_ips defaults to false ---
+# The flag must never be on by default — it must be set explicitly at the CLI.
+
+run "allow_all_ips_defaults_to_false" {
+  command = plan
+
+  assert {
+    condition     = var.allow_all_ips == false
+    error_message = "allow_all_ips must default to false; it may only be set via CLI (TF_VAR_allow_all_ips=true)"
+  }
+}
+
+# --- allow_all_ips=true is accepted and propagated ---
+# When set, the flag should be accepted without error.
+
+run "allow_all_ips_can_be_enabled" {
+  command = plan
+
+  variables {
+    allow_all_ips = true
+  }
+
+  assert {
+    condition     = var.allow_all_ips == true
+    error_message = "allow_all_ips=true should be accepted"
+  }
+}
