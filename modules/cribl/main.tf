@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.0"
     }
+    http = {
+      source  = "hashicorp/http"
+      version = "~> 3.0"
+    }
   }
 }
 
@@ -17,6 +21,23 @@ locals {
     Project     = "splunk-aws"
     ManagedBy   = "terraform"
   }
+
+  # Download URLs — validated at plan/apply time via data "http" resources
+  cribl_stream_rpm_url = "https://cdn.cribl.io/dl/${var.cribl_version}/cribl-${var.cribl_version}-${var.cribl_build}-linux-x64.rpm"
+  cribl_edge_zip_url   = "https://cdn.cribl.io/dl/${var.cribl_version}/cribl-${var.cribl_version}-${var.cribl_build}-windows-x64.zip"
+}
+
+# Pre-deployment validation: verify download URLs exist before creating instances
+data "http" "cribl_stream_rpm" {
+  count  = var.enable_cribl ? 1 : 0
+  url    = local.cribl_stream_rpm_url
+  method = "HEAD"
+}
+
+data "http" "cribl_edge_zip" {
+  count  = var.enable_cribl ? 1 : 0
+  url    = local.cribl_edge_zip_url
+  method = "HEAD"
 }
 
 # Cribl Stream user_data — install via RPM, configure as leader
@@ -34,11 +55,10 @@ locals {
     # Create cribl user
     useradd -r -m -s /bin/bash cribl
 
-    # Download and install Cribl Stream via RPM
+    # Download and install Cribl Stream via RPM (URL pre-validated by check block)
     cd /tmp
     CRIBL_RPM="cribl-${var.cribl_version}-${var.cribl_build}-linux-x64.rpm"
-    CRIBL_URL="https://cdn.cribl.io/dl/${var.cribl_version}/$CRIBL_RPM"
-    curl -fsSL -o "$CRIBL_RPM" "$CRIBL_URL"
+    curl -fsSL -o "$CRIBL_RPM" "${local.cribl_stream_rpm_url}"
     rpm -ivh "$CRIBL_RPM"
     chown -R cribl:cribl /opt/cribl
 
@@ -52,7 +72,7 @@ locals {
   )
 }
 
-# Cribl Edge user_data — Windows PowerShell, silent MSI install connecting to Stream leader
+# Cribl Edge user_data — Windows PowerShell, ZIP install connecting to Stream leader
 locals {
   cribl_edge_user_data = base64encode(<<-WINEOF
 <powershell>
@@ -65,18 +85,28 @@ Get-LocalUser -Name "Administrator" | Set-LocalUser -Password $adminPassword
 $criblVersion = "${var.cribl_version}"
 $criblBuild = "${var.cribl_build}"
 $streamIp = "${try(aws_instance.cribl_stream[0].private_ip, "")}"
-$msiUrl = "https://cdn.cribl.io/dl/$criblVersion/cribl-edge-$criblVersion-$criblBuild-win64.msi"
-$msiPath = "C:\Windows\Temp\cribl-edge.msi"
+$zipUrl = "${local.cribl_edge_zip_url}"
+$zipPath = "C:\Windows\Temp\cribl-edge.zip"
+$installDir = "C:\Program Files\Cribl"
 
-# Download MSI
+# Download and extract
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-Invoke-WebRequest -Uri $msiUrl -OutFile $msiPath
+Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
+Expand-Archive -Path $zipPath -DestinationPath $installDir -Force
 
-# Install Cribl Edge in managed-edge mode connecting to Stream leader
-Start-Process msiexec.exe -ArgumentList "/qn /i `"$msiPath`" CRIBL_LEADER=tcp://$($streamIp):4200" -Wait -NoNewWindow
+# Configure as managed edge connecting to Stream leader
+& "$installDir\cribl\bin\cribl.cmd" mode-managed-edge
+Set-Content -Path "$installDir\cribl\local\cribl.yml" -Value @"
+distributed:
+  mode: managed-edge
+  master:
+    host: $streamIp
+    port: 4200
+"@
 
-# Start the service
-Start-Service CriblEdge
+# Install and start as Windows service
+& "$installDir\cribl\bin\cribl.cmd" boot-start enable
+Start-Service Cribl
 </powershell>
   WINEOF
   )
@@ -113,6 +143,10 @@ resource "aws_instance" "cribl_stream" {
 
   lifecycle {
     create_before_destroy = true
+    precondition {
+      condition     = data.http.cribl_stream_rpm[0].status_code == 200
+      error_message = "Cribl Stream RPM not found at ${local.cribl_stream_rpm_url} (HTTP ${try(data.http.cribl_stream_rpm[0].status_code, "unknown")}). Check cribl_version and cribl_build."
+    }
   }
 }
 
@@ -147,6 +181,10 @@ resource "aws_instance" "cribl_edge" {
 
   lifecycle {
     create_before_destroy = true
+    precondition {
+      condition     = data.http.cribl_edge_zip[0].status_code == 200
+      error_message = "Cribl Edge ZIP not found at ${local.cribl_edge_zip_url} (HTTP ${try(data.http.cribl_edge_zip[0].status_code, "unknown")}). Check cribl_version and cribl_build."
+    }
   }
 }
 

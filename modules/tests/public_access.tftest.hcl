@@ -10,6 +10,14 @@
 mock_provider "aws" {}
 mock_provider "random" {}
 mock_provider "tls" {}
+mock_provider "http" {
+  mock_data "http" {
+    defaults = {
+      status_code   = 200
+      response_body = ""
+    }
+  }
+}
 
 # Override child modules so the root module plans in isolation.
 override_module {
