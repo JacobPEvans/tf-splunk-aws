@@ -78,16 +78,20 @@ run "outputs_plan_succeeds" {
   command = plan
 }
 
-# --- estimated_monthly_cost is a non-empty string ---
-# This is a static string in outputs.tf documenting the cost estimate.
-# It must remain present for operational awareness.
+# --- estimated_cost contains daily and monthly breakdowns ---
+# The cost output must contain both daily and monthly estimates for operational awareness.
 
-run "estimated_monthly_cost_is_non_empty" {
+run "estimated_cost_has_daily_and_monthly" {
   command = plan
 
   assert {
-    condition     = length(output.estimated_monthly_cost) > 0
-    error_message = "estimated_monthly_cost output must be a non-empty string"
+    condition     = output.estimated_cost.daily != null
+    error_message = "estimated_cost must contain daily breakdown"
+  }
+
+  assert {
+    condition     = output.estimated_cost.monthly != null
+    error_message = "estimated_cost must contain monthly breakdown"
   }
 }
 

@@ -124,9 +124,31 @@ output "smartstore_bucket_name" {
 }
 
 # Cost Estimation
-output "estimated_monthly_cost" {
-  description = "Estimated monthly cost in USD (always-on vs auto-lifecycle)"
-  value       = var.enable_cribl ? "Always-on: ~$77/mo (NAT: $2.52, Splunk: $12.18, Stream: $13.74, Edge/Win: $42.34, EBS: $6.17, S3: ~$0.50) | Auto-lifecycle Splunk: ~$68/mo" : "Always-on: ~$18.17/mo (NAT: $2.52, Splunk: $12.18, EBS: $2.97, S3: ~$0.50) | Auto-lifecycle: ~$9/mo (Splunk 25%: ~$3.05)"
+output "estimated_cost" {
+  description = "Estimated daily and monthly cost in USD (always-on vs auto-lifecycle)"
+  value = var.enable_cribl ? {
+    daily = {
+      always_on      = "$2.57/day"
+      auto_lifecycle = "$2.27/day"
+      breakdown      = "NAT: $0.08, Splunk: $0.41 (always-on) / $0.10 (lifecycle), Stream: $0.46, Edge/Win: $1.41, EBS: $0.21, S3: ~$0.02"
+    }
+    monthly = {
+      always_on      = "$77/mo"
+      auto_lifecycle = "$68/mo"
+      breakdown      = "NAT: $2.52, Splunk: $12.18 (always-on) / $3.05 (lifecycle), Stream: $13.74, Edge/Win: $42.34, EBS: $6.17, S3: ~$0.50"
+    }
+  } : {
+    daily = {
+      always_on      = "$0.61/day"
+      auto_lifecycle = "$0.30/day"
+      breakdown      = "NAT: $0.08, Splunk: $0.41 (always-on) / $0.10 (lifecycle), EBS: $0.10, S3: ~$0.02"
+    }
+    monthly = {
+      always_on      = "$18.17/mo"
+      auto_lifecycle = "$9/mo"
+      breakdown      = "NAT: $2.52, Splunk: $12.18 (always-on) / $3.05 (lifecycle), EBS: $2.97, S3: ~$0.50"
+    }
+  }
 }
 
 # Access Information
