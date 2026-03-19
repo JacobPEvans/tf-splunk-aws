@@ -10,6 +10,8 @@
 # the NAT module are wired correctly as a proxy for routing readiness.
 
 mock_provider "aws" {}
+mock_provider "random" {}
+mock_provider "tls" {}
 
 # Override non-network child modules so we can test the root module's
 # network wiring in isolation.
@@ -70,9 +72,8 @@ variables {
   availability_zones    = ["us-east-2a", "us-east-2b"]
   public_subnet_cidrs   = ["10.0.1.0/24", "10.0.2.0/24"]
   private_subnet_cidrs  = ["10.0.10.0/24", "10.0.20.0/24"]
-  nat_instance_type     = "t4g.nano"
-  splunk_instance_type  = "t3a.small"
-  splunk_admin_password = "mock-password-value"
+  nat_instance_type    = "t4g.nano"
+  splunk_instance_type = "t3a.small"
 }
 
 # --- Plan succeeds with valid network inputs ---

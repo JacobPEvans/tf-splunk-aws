@@ -6,6 +6,8 @@
 # All runs use mock providers - no AWS credentials needed.
 
 mock_provider "aws" {}
+mock_provider "random" {}
+mock_provider "tls" {}
 
 # Override all child modules with realistic mock outputs so the root module
 # output expressions can be evaluated at plan time.
@@ -66,9 +68,8 @@ variables {
   availability_zones    = ["us-east-2a", "us-east-2b"]
   public_subnet_cidrs   = ["10.0.1.0/24", "10.0.2.0/24"]
   private_subnet_cidrs  = ["10.0.10.0/24", "10.0.20.0/24"]
-  nat_instance_type     = "t4g.nano"
-  splunk_instance_type  = "t3a.small"
-  splunk_admin_password = "mock-password-value"
+  nat_instance_type    = "t4g.nano"
+  splunk_instance_type = "t3a.small"
 }
 
 # --- Plan succeeds and all outputs are produced ---

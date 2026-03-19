@@ -56,9 +56,12 @@ locals {
 locals {
   cribl_edge_user_data = base64encode(<<-WINEOF
 <powershell>
-# Install Cribl Edge and connect to Stream leader
+# Set Administrator password (auto-generated per-build)
 $ErrorActionPreference = "Stop"
+$adminPassword = ConvertTo-SecureString "${var.windows_admin_password}" -AsPlainText -Force
+Get-LocalUser -Name "Administrator" | Set-LocalUser -Password $adminPassword
 
+# Install Cribl Edge and connect to Stream leader
 $criblVersion = "${var.cribl_version}"
 $criblBuild = "${var.cribl_build}"
 $streamIp = "${try(aws_instance.cribl_stream[0].private_ip, "")}"

@@ -295,27 +295,18 @@ resource "aws_security_group" "cribl" {
   description = "Security group for Cribl Stream and Edge instances"
   vpc_id      = var.vpc_id
 
-  # Cribl Web UI + leader/worker comms (4200)
+  # Cribl ports (4200: Web UI + leader/worker comms; 9997: data ingest)
   dynamic "ingress" {
-    for_each = var.allow_all_ips || length(var.cribl_allowed_cidrs) > 0 ? [1] : []
+    for_each = var.allow_all_ips || length(var.cribl_allowed_cidrs) > 0 ? {
+      "4200" = "Cribl Web UI and leader/worker comms"
+      "9997" = "Cribl data ingest"
+    } : {}
     content {
-      from_port   = 4200
-      to_port     = 4200
+      from_port   = tonumber(ingress.key)
+      to_port     = tonumber(ingress.key)
       protocol    = "tcp"
       cidr_blocks = var.allow_all_ips ? ["0.0.0.0/0"] : var.cribl_allowed_cidrs
-      description = "Cribl Web UI and leader/worker comms"
-    }
-  }
-
-  # Cribl data ingest (9997)
-  dynamic "ingress" {
-    for_each = var.allow_all_ips || length(var.cribl_allowed_cidrs) > 0 ? [1] : []
-    content {
-      from_port   = 9997
-      to_port     = 9997
-      protocol    = "tcp"
-      cidr_blocks = var.allow_all_ips ? ["0.0.0.0/0"] : var.cribl_allowed_cidrs
-      description = "Cribl data ingest"
+      description = ingress.value
     }
   }
 

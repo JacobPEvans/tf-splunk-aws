@@ -145,3 +145,42 @@ output "connection_info" {
     } : {}
   )
 }
+
+# All access credentials — ephemeral, auto-generated per-build
+# Using nonsensitive() because these are disposable dev/DR credentials
+# destroyed with the environment. Run `terragrunt output access_credentials` to retrieve.
+output "access_credentials" {
+  description = "All IPs, usernames, passwords, and SSH keys for the current deployment"
+  value = {
+    ssh_private_key = nonsensitive(tls_private_key.access.private_key_openssh)
+    ssh_key_name    = aws_key_pair.generated.key_name
+
+    splunk = {
+      web_url   = module.splunk.splunk_web_url
+      public_ip = module.splunk.splunk_instance_public_ip
+      username  = "admin"
+      password  = nonsensitive(local.effective_splunk_password)
+      ssh       = module.splunk.splunk_instance_public_ip != null ? "ssh -i key.pem ec2-user@${module.splunk.splunk_instance_public_ip}" : "Use SSM Session Manager"
+    }
+
+    nat = {
+      public_ip = module.compute.nat_instance_public_ip
+      ssh       = "ssh -i key.pem ec2-user@${module.compute.nat_instance_public_ip}"
+    }
+
+    cribl_stream = var.enable_cribl ? {
+      web_url   = module.cribl.cribl_stream_web_url
+      public_ip = module.cribl.cribl_stream_public_ip
+      username  = "admin"
+      password  = "admin (change on first login)"
+      ssh       = module.cribl.cribl_stream_public_ip != null ? "ssh -i key.pem ec2-user@${module.cribl.cribl_stream_public_ip}" : "Use SSM Session Manager"
+    } : null
+
+    windows_rdp = var.enable_cribl ? {
+      public_ip = module.cribl.cribl_edge_public_ip
+      username  = "Administrator"
+      password  = nonsensitive(random_password.windows_admin.result)
+      rdp       = module.cribl.cribl_edge_public_ip != null ? "mstsc /v:${module.cribl.cribl_edge_public_ip}" : "Use SSM Session Manager"
+    } : null
+  }
+}

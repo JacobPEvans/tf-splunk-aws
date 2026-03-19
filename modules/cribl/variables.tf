@@ -60,6 +60,12 @@ variable "windows_ami_id" {
   type        = string
 }
 
+variable "windows_admin_password" {
+  description = "Administrator password for the Windows Cribl Edge instance"
+  type        = string
+  sensitive   = true
+}
+
 variable "cribl_version" {
   description = "Cribl Stream/Edge version to install"
   type        = string

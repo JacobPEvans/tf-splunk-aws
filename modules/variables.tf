@@ -65,13 +65,14 @@ variable "splunk_data_volume_size" {
 }
 
 variable "splunk_admin_password" {
-  description = "Admin password for Splunk (use strong password)"
+  description = "Admin password for Splunk. If null or empty, a random 24-char password is generated per-build."
   type        = string
   sensitive   = true
+  default     = null
 
   validation {
-    condition     = length(var.splunk_admin_password) >= 8
-    error_message = "Splunk admin password must be at least 8 characters."
+    condition     = var.splunk_admin_password == null || var.splunk_admin_password == "" || length(var.splunk_admin_password) >= 8
+    error_message = "Splunk admin password must be at least 8 characters when provided."
   }
 }
 
