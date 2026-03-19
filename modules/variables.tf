@@ -134,6 +134,46 @@ variable "ssh_allowed_cidrs" {
   }
 }
 
+variable "enable_cribl" {
+  description = "Enable Cribl Stream and Edge instances"
+  type        = bool
+  default     = true
+}
+
+variable "cribl_stream_instance_type" {
+  description = "Instance type for Cribl Stream (must be x86_64)"
+  type        = string
+  default     = "t3a.small"
+
+  validation {
+    condition     = !can(regex("(^a1\\.|[0-9]g\\.)", var.cribl_stream_instance_type))
+    error_message = "cribl_stream_instance_type must be x86_64. ARM/Graviton families are not supported."
+  }
+}
+
+variable "cribl_edge_instance_type" {
+  description = "Instance type for Cribl Edge Windows instance (must be x86_64)"
+  type        = string
+  default     = "t3a.medium"
+
+  validation {
+    condition     = !can(regex("(^a1\\.|[0-9]g\\.)", var.cribl_edge_instance_type))
+    error_message = "cribl_edge_instance_type must be x86_64. ARM/Graviton families are not supported."
+  }
+}
+
+variable "management_allowed_cidrs" {
+  description = "CIDR blocks for management ports (SSH 22, RDP 3389, Splunk mgmt 8089) — always restricted, never affected by allow_all_ips"
+  type        = list(string)
+  default     = []
+}
+
+variable "cribl_allowed_cidrs" {
+  description = "CIDR blocks for Cribl ports (4200 Web/leader, 9997 data ingest) — affected by allow_all_ips"
+  type        = list(string)
+  default     = []
+}
+
 variable "enable_auto_lifecycle" {
   description = "Enable automatic start/stop lifecycle for Splunk instance. EventBridge starts Splunk on a schedule; per-boot script stops it after auto_shutdown_minutes."
   type        = bool

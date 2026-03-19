@@ -46,6 +46,27 @@ data "aws_ami" "amazon_linux_x86" {
   }
 }
 
+# Windows Server 2022 AMI for Cribl Edge
+data "aws_ami" "windows_2022" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["Windows_Server-2022-English-Full-Base-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+}
+
 # SmartStore S3 Bucket - remote storage for Splunk warm/cold index buckets
 # Created at root level to break circular dependency: security needs ARN for IAM, splunk needs name for config
 resource "aws_s3_bucket" "smartstore" {
@@ -129,11 +150,14 @@ module "security" {
   vpc_cidr_blocks       = [module.network.vpc_cidr_block]
   private_subnet_cidrs  = var.private_subnet_cidrs
   splunk_admin_password = var.splunk_admin_password
-  ssh_allowed_cidrs     = var.ssh_allowed_cidrs
-  hec_allowed_cidrs     = var.hec_allowed_cidrs
-  web_allowed_cidrs     = var.web_allowed_cidrs
-  allow_all_ips         = var.allow_all_ips
-  smartstore_bucket_arn = aws_s3_bucket.smartstore.arn
+  ssh_allowed_cidrs        = var.ssh_allowed_cidrs
+  hec_allowed_cidrs        = var.hec_allowed_cidrs
+  web_allowed_cidrs        = var.web_allowed_cidrs
+  allow_all_ips            = var.allow_all_ips
+  smartstore_bucket_arn    = aws_s3_bucket.smartstore.arn
+  enable_cribl             = var.enable_cribl
+  management_allowed_cidrs = var.management_allowed_cidrs
+  cribl_allowed_cidrs      = var.cribl_allowed_cidrs
 }
 
 # Compute Module (NAT Instance)
@@ -158,7 +182,10 @@ module "splunk" {
   splunk_data_volume_size      = var.splunk_data_volume_size
   splunk_password_ssm_name     = module.security.splunk_password_ssm_name
   key_pair_name                = var.key_pair_name
-  splunk_security_group_id     = module.security.splunk_security_group_id
+  splunk_security_group_ids    = concat(
+    [module.security.splunk_security_group_id],
+    var.enable_cribl ? [module.security.internal_security_group_id] : []
+  )
   subnet_ids                   = var.splunk_public_access ? module.network.public_subnet_ids : module.network.private_subnet_ids
   associate_public_ip_address  = var.splunk_public_access
   splunk_instance_profile_name = module.security.splunk_instance_profile_name
@@ -169,6 +196,23 @@ module "splunk" {
   enable_auto_lifecycle        = var.enable_auto_lifecycle
   auto_shutdown_minutes        = var.auto_shutdown_minutes
   lifecycle_interval_hours     = var.lifecycle_interval_hours
+}
+
+# Cribl Module (Stream + Edge)
+module "cribl" {
+  source = "./cribl"
+
+  environment                 = var.environment
+  enable_cribl                = var.enable_cribl
+  cribl_stream_instance_type  = var.cribl_stream_instance_type
+  cribl_edge_instance_type    = var.cribl_edge_instance_type
+  key_pair_name               = var.key_pair_name
+  security_group_ids          = var.enable_cribl ? [module.security.cribl_security_group_id, module.security.internal_security_group_id] : []
+  subnet_ids                  = var.splunk_public_access ? module.network.public_subnet_ids : module.network.private_subnet_ids
+  associate_public_ip_address = var.splunk_public_access
+  instance_profile_name       = var.enable_cribl ? module.security.cribl_instance_profile_name : ""
+  linux_ami_id                = data.aws_ami.amazon_linux_x86.id
+  windows_ami_id              = data.aws_ami.windows_2022.id
 }
 
 # Route private subnet traffic through NAT instance

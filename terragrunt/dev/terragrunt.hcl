@@ -30,6 +30,11 @@ inputs = {
   # Public access: place Splunk in public subnet with public IP
   splunk_public_access = true
 
+  # Cribl Stream + Edge
+  enable_cribl             = true
+  management_allowed_cidrs = local.allowed_cidrs
+  cribl_allowed_cidrs      = local.allowed_cidrs
+
   # CIDRs from Doppler NETWORK_PUBLIC_IP_ADDRESS (iac-conf-mgmt/prd)
   # Never commit real IPs — empty default disables external access if env var unset
   web_allowed_cidrs = local.allowed_cidrs

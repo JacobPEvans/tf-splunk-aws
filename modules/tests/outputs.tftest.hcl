@@ -17,6 +17,9 @@ override_module {
     splunk_instance_profile_name = "mock-splunk-instance-profile"
     splunk_iam_role_arn          = "arn:aws:iam::123456789012:role/mock-splunk-role"
     splunk_password_ssm_name     = "/dev/splunk/admin-password"
+    internal_security_group_id   = "sg-00000000000000003"
+    cribl_security_group_id      = "sg-00000000000000004"
+    cribl_instance_profile_name  = "mock-cribl-instance-profile"
   }
 }
 
@@ -40,6 +43,19 @@ override_module {
     splunk_web_url              = "http://10.0.10.20:8000"
     splunk_cloudwatch_log_group = "/aws/ec2/splunk"
     splunk_app_log_group        = "/aws/ec2/splunk/app"
+  }
+}
+
+override_module {
+  target = module.cribl
+  outputs = {
+    cribl_stream_instance_id = "i-00000000000000003"
+    cribl_stream_private_ip  = "10.0.10.30"
+    cribl_stream_public_ip   = null
+    cribl_stream_web_url     = "http://10.0.10.30:4200"
+    cribl_edge_instance_id   = "i-00000000000000004"
+    cribl_edge_private_ip    = "10.0.10.40"
+    cribl_edge_public_ip     = null
   }
 }
 
@@ -193,5 +209,68 @@ run "smartstore_bucket_name_is_non_null" {
   assert {
     condition     = output.smartstore_bucket_name != null
     error_message = "smartstore_bucket_name output must be non-null"
+  }
+}
+
+# --- Cribl outputs are present when enabled (default) ---
+
+run "cribl_outputs_are_present" {
+  command = plan
+
+  assert {
+    condition     = output.cribl_stream_instance_id != null
+    error_message = "cribl_stream_instance_id must be non-null when enable_cribl defaults to true"
+  }
+
+  assert {
+    condition     = output.cribl_stream_private_ip != null
+    error_message = "cribl_stream_private_ip must be non-null when enable_cribl defaults to true"
+  }
+
+  assert {
+    condition     = output.cribl_stream_web_url != null
+    error_message = "cribl_stream_web_url must be non-null when enable_cribl defaults to true"
+  }
+
+  assert {
+    condition     = output.cribl_edge_instance_id != null
+    error_message = "cribl_edge_instance_id must be non-null when enable_cribl defaults to true"
+  }
+
+  assert {
+    condition     = output.cribl_edge_private_ip != null
+    error_message = "cribl_edge_private_ip must be non-null when enable_cribl defaults to true"
+  }
+}
+
+# --- Cribl security group outputs are present ---
+
+run "cribl_security_group_outputs_present" {
+  command = plan
+
+  assert {
+    condition     = output.internal_security_group_id != null
+    error_message = "internal_security_group_id must be non-null when Cribl enabled"
+  }
+
+  assert {
+    condition     = output.cribl_security_group_id != null
+    error_message = "cribl_security_group_id must be non-null when Cribl enabled"
+  }
+}
+
+# --- connection_info includes Cribl fields when enabled ---
+
+run "connection_info_includes_cribl_fields" {
+  command = plan
+
+  assert {
+    condition     = output.connection_info.cribl_stream_web_url != null
+    error_message = "connection_info must contain cribl_stream_web_url when Cribl enabled"
+  }
+
+  assert {
+    condition     = output.connection_info.cribl_edge_ip != null
+    error_message = "connection_info must contain cribl_edge_ip when Cribl enabled"
   }
 }

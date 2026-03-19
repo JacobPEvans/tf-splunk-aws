@@ -125,7 +125,7 @@ resource "aws_instance" "splunk" {
   ami                         = var.ami_id
   instance_type               = var.splunk_instance_type
   key_name                    = var.key_pair_name
-  vpc_security_group_ids      = [var.splunk_security_group_id]
+  vpc_security_group_ids      = var.splunk_security_group_ids
   subnet_id                   = var.subnet_ids[0]
   associate_public_ip_address = var.associate_public_ip_address
   iam_instance_profile        = var.splunk_instance_profile_name
