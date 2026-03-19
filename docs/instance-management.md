@@ -50,7 +50,7 @@ Default config: start every 4 hours, run 60 minutes = ~25% utilization.
 | Resource | Monthly |
 | ---------- | ------- |
 | Splunk t3a.small × 25% | ~$3.05 |
-| NAT t4g.nano (must stay on to receive data) | ~$2.52 |
+| NAT t4g.nano (must stay on for egress routing) | ~$2.52 |
 | EBS + S3 | ~$3.47 |
 | **Total** | **~$9.04** |
 
@@ -58,11 +58,11 @@ Default config: start every 4 hours, run 60 minutes = ~25% utilization.
 
 ## Pause Procedure (stop both instances)
 
-Get the instance IDs from Terraform outputs first:
+Get the instance IDs from Terragrunt outputs first:
 
 ```bash
-cd ~/git/tf-splunk-aws/feature/docs-instance-management  # or main/
-aws-vault exec tf-splunk-aws -- terragrunt output
+cd ~/git/tf-splunk-aws/main/terragrunt/dev
+aws-vault exec tf-splunk-aws -- doppler run -- terragrunt output
 ```
 
 Note `splunk_instance_id` and `nat_instance_id` from the output.
@@ -135,9 +135,11 @@ aws-vault exec tf-splunk-aws -- aws ec2 describe-instances \
   --output text
 ```
 
-Splunk Web is available at `http://<new-ip>:8000` after ~2–3 minutes boot time
-(user_data runs on every boot: installs Splunk if needed, retrieves SSM password,
-starts Splunk, applies SmartStore config).
+Splunk Web is available at `http://<new-ip>:8000` after ~2–3 minutes boot time.
+On resume, Splunk starts automatically via the boot-start service configured during
+first-boot provisioning. If `enable_auto_lifecycle = true`, the per-boot shutdown
+script (`/var/lib/cloud/scripts/per-boot/auto-shutdown.sh`) also runs and schedules
+automatic shutdown after `auto_shutdown_minutes`.
 
 ---
 
@@ -145,13 +147,14 @@ starts Splunk, applies SmartStore config).
 
 ### State drift
 
-Terraform does not manage instance power state, so stopping instances via AWS CLI
+OpenTofu does not manage instance power state, so stopping instances via AWS CLI
 does not create plan drift. A `terragrunt plan` after pause will show no changes.
 
 ### Boot time
 
 Allow ~2–3 minutes after `instance-running` before Splunk Web is reachable.
-The `user_data` script runs at every boot. SSM password retrieval adds ~5–10 s.
+On resume, Splunk starts via the boot-start service; first-boot provisioning
+(package install, SSM password retrieval, SmartStore config) does not repeat.
 
 ### Data ingestion during pause
 
@@ -166,7 +169,8 @@ If you want automated cost control without manual steps, set
 EventBridge Scheduler to start Splunk on a configurable interval
 (`lifecycle_interval_hours`, default 4) and shut it down automatically after
 `auto_shutdown_minutes` (default 60). The NAT instance must remain running to
-receive forwarded data.
+provide egress routing for the Splunk instance (private-subnet traffic to S3,
+SSM, and other AWS endpoints routes through NAT).
 
 ### Elastic IP (EIP)
 
