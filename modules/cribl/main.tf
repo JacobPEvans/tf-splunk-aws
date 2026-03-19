@@ -55,15 +55,24 @@ locals {
     # Create cribl user
     useradd -r -m -s /bin/bash cribl
 
-    # Download and install Cribl Stream via RPM (URL pre-validated by check block)
+    # Download and install Cribl Stream via RPM (URL pre-validated by data "http")
     cd /tmp
     CRIBL_RPM="cribl-${var.cribl_version}-${var.cribl_build}-linux-x64.rpm"
     curl -fsSL -o "$CRIBL_RPM" "${local.cribl_stream_rpm_url}"
     rpm -ivh "$CRIBL_RPM"
     chown -R cribl:cribl /opt/cribl
 
-    # Configure as leader (single-instance mode with API on 4200)
-    sudo -u cribl /opt/cribl/bin/cribl mode-master
+    # Configure as leader mode via config before first start
+    mkdir -p /opt/cribl/local/cribl
+    cat > /opt/cribl/local/cribl/cribl.yml << 'CRIBL_CFG'
+distributed:
+  mode: master
+  group: default
+api:
+  host: 0.0.0.0
+  port: 4200
+CRIBL_CFG
+    chown -R cribl:cribl /opt/cribl/local
 
     # Enable boot-start via systemd and start (--no-block avoids systemd timeout on slow instances)
     /opt/cribl/bin/cribl boot-start enable -m systemd -u cribl
