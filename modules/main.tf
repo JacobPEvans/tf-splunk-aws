@@ -40,7 +40,8 @@ resource "random_password" "windows_admin" {
 }
 
 resource "tls_private_key" "access" {
-  algorithm = "ED25519"
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 resource "aws_key_pair" "generated" {
