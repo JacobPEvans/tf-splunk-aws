@@ -65,9 +65,9 @@ locals {
     # Configure as leader (single-instance mode with API on 4200)
     sudo -u cribl /opt/cribl/bin/cribl mode-master
 
-    # Enable boot-start via systemd and start
+    # Enable boot-start via systemd and start (--no-block avoids systemd timeout on slow instances)
     /opt/cribl/bin/cribl boot-start enable -m systemd -u cribl
-    systemctl start cribl
+    systemctl start cribl --no-block
   EOF
   )
 }
