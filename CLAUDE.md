@@ -68,6 +68,35 @@ direnv allow    # one-time per worktree
 nix develop
 ```
 
+## Claude Code with AWS Credentials
+
+Claude Code cannot access the macOS keychain for `aws-vault` prompts. To run
+Terragrunt operations (init, plan, apply, destroy) from Claude, **start the
+session with credentials already injected**:
+
+```bash
+# Launch Claude Code with AWS credentials pre-loaded
+aws-vault exec tf-splunk-aws -- doppler run -- claude
+
+# All Bash tool calls inside the session inherit AWS_* and Doppler env vars.
+# No aws-vault or doppler wrapper needed on individual commands:
+#   terragrunt init
+#   terragrunt plan
+#   terragrunt apply
+#   terragrunt destroy -auto-approve
+```
+
+STS credentials last ~1 hour. If they expire mid-session, exit and re-launch.
+
+Offline operations (validate, test) never need credentials — run them directly:
+
+```bash
+cd modules/
+tofu init -backend=false
+tofu validate
+tofu test -no-color
+```
+
 ## Commands
 
 ### Prerequisites
