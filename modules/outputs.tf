@@ -137,7 +137,7 @@ output "estimated_cost" {
       auto_lifecycle = "$68/mo"
       breakdown      = "NAT: $2.52, Splunk: $12.18 (always-on) / $3.05 (lifecycle), Stream: $13.74, Edge/Win: $42.34, EBS: $6.17, S3: ~$0.50"
     }
-  } : {
+    } : {
     daily = {
       always_on      = "$0.61/day"
       auto_lifecycle = "$0.30/day"

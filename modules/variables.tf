@@ -147,7 +147,7 @@ variable "cribl_stream_instance_type" {
   default     = "t3a.small"
 
   validation {
-    condition     = !can(regex("(^a1\\.|[0-9]g\\.)", var.cribl_stream_instance_type))
+    condition     = !can(regex("(^a1\\.|[0-9]+g[a-z]*\\.)", var.cribl_stream_instance_type))
     error_message = "cribl_stream_instance_type must be x86_64. ARM/Graviton families are not supported."
   }
 }
@@ -158,13 +158,13 @@ variable "cribl_edge_instance_type" {
   default     = "t3a.medium"
 
   validation {
-    condition     = !can(regex("(^a1\\.|[0-9]g\\.)", var.cribl_edge_instance_type))
+    condition     = !can(regex("(^a1\\.|[0-9]+g[a-z]*\\.)", var.cribl_edge_instance_type))
     error_message = "cribl_edge_instance_type must be x86_64. ARM/Graviton families are not supported."
   }
 }
 
 variable "management_allowed_cidrs" {
-  description = "CIDR blocks for management ports (SSH 22, RDP 3389, Splunk mgmt 8089) — always restricted, never affected by allow_all_ips"
+  description = "CIDR blocks for management ports (RDP 3389, Splunk mgmt 8089) — always restricted, never affected by allow_all_ips. SSH is controlled by ssh_allowed_cidrs."
   type        = list(string)
   default     = []
 }

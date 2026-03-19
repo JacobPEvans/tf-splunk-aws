@@ -59,6 +59,8 @@ locals {
     cd /tmp
     CRIBL_RPM="cribl-${var.cribl_version}-${var.cribl_build}-linux-x64.rpm"
     curl -fsSL -o "$CRIBL_RPM" "${local.cribl_stream_rpm_url}"
+    curl -fsSL -o "$CRIBL_RPM.sha256" "${local.cribl_stream_rpm_url}.sha256"
+    sha256sum -c "$CRIBL_RPM.sha256" || { echo "ERROR: Cribl Stream RPM checksum mismatch. Aborting." >&2; exit 1; }
     rpm -ivh "$CRIBL_RPM"
     chown -R cribl:cribl /opt/cribl
 
@@ -98,9 +100,16 @@ $zipUrl = "${local.cribl_edge_zip_url}"
 $zipPath = "C:\Windows\Temp\cribl-edge.zip"
 $installDir = "C:\Program Files\Cribl"
 
-# Download and extract
+# Download and verify checksum
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
+$sha256File = $zipPath + ".sha256"
+Invoke-WebRequest -Uri ($zipUrl + ".sha256") -OutFile $sha256File
+$expectedHash = (Get-Content $sha256File -Raw).Split(" ")[0].Trim().ToUpper()
+$actualHash = (Get-FileHash -Algorithm SHA256 $zipPath).Hash.ToUpper()
+if ($actualHash -ne $expectedHash) {
+  throw "ERROR: Cribl Edge ZIP checksum mismatch. Expected: $expectedHash Actual: $actualHash"
+}
 Expand-Archive -Path $zipPath -DestinationPath $installDir -Force
 
 # Configure as managed edge connecting to Stream leader

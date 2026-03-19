@@ -69,11 +69,11 @@ variable "windows_admin_password" {
 variable "cribl_version" {
   description = "Cribl Stream/Edge version to install"
   type        = string
-  default     = "4.13.1"
+  default     = "4.16.1"
 }
 
 variable "cribl_build" {
   description = "Cribl build identifier for package download"
   type        = string
-  default     = "29ffdd48"
+  default     = "20904e45"
 }

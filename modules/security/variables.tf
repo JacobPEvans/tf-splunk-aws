@@ -64,7 +64,7 @@ variable "enable_cribl" {
 }
 
 variable "management_allowed_cidrs" {
-  description = "CIDR blocks for management ports (SSH 22, RDP 3389, Splunk mgmt 8089) — always restricted, never affected by allow_all_ips"
+  description = "CIDR blocks for management ports (RDP 3389, Splunk mgmt 8089) — always restricted, never affected by allow_all_ips. SSH is controlled by ssh_allowed_cidrs."
   type        = list(string)
   default     = []
 }
