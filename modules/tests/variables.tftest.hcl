@@ -5,17 +5,26 @@
 # All runs use mock providers - no AWS credentials needed.
 
 mock_provider "aws" {}
+mock_provider "random" {}
+mock_provider "tls" {}
+mock_provider "http" {
+  mock_data "http" {
+    defaults = {
+      status_code   = 200
+      response_body = ""
+    }
+  }
+}
 
 # Shared valid defaults for all runs
 variables {
-  environment           = "dev"
-  vpc_cidr              = "10.0.0.0/16"
-  availability_zones    = ["us-east-2a", "us-east-2b"]
-  public_subnet_cidrs   = ["10.0.1.0/24", "10.0.2.0/24"]
-  private_subnet_cidrs  = ["10.0.10.0/24", "10.0.20.0/24"]
-  nat_instance_type     = "t4g.nano"
-  splunk_instance_type  = "t3a.small"
-  splunk_admin_password = "mock-password-value"
+  environment          = "dev"
+  vpc_cidr             = "10.0.0.0/16"
+  availability_zones   = ["us-east-2a", "us-east-2b"]
+  public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+  private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
+  nat_instance_type    = "t4g.nano"
+  splunk_instance_type = "t3a.small"
 }
 
 # --- Positive test: valid default configuration passes plan ---
@@ -125,5 +134,58 @@ run "key_pair_name_defaults_to_null" {
   assert {
     condition     = var.key_pair_name == null
     error_message = "key_pair_name should default to null (SSH disabled by default)"
+  }
+}
+
+# --- enable_cribl defaults to true ---
+
+run "enable_cribl_defaults_to_true" {
+  command = plan
+
+  assert {
+    condition     = var.enable_cribl == true
+    error_message = "enable_cribl should default to true"
+  }
+}
+
+# --- Cribl instance type defaults ---
+
+run "cribl_stream_instance_type_default" {
+  command = plan
+
+  assert {
+    condition     = var.cribl_stream_instance_type == "t3a.small"
+    error_message = "cribl_stream_instance_type should default to t3a.small, got ${var.cribl_stream_instance_type}"
+  }
+}
+
+run "cribl_edge_instance_type_default" {
+  command = plan
+
+  assert {
+    condition     = var.cribl_edge_instance_type == "t3a.medium"
+    error_message = "cribl_edge_instance_type should default to t3a.medium, got ${var.cribl_edge_instance_type}"
+  }
+}
+
+# --- management_allowed_cidrs defaults to empty ---
+
+run "management_allowed_cidrs_default" {
+  command = plan
+
+  assert {
+    condition     = length(var.management_allowed_cidrs) == 0
+    error_message = "management_allowed_cidrs should default to []"
+  }
+}
+
+# --- cribl_allowed_cidrs defaults to empty ---
+
+run "cribl_allowed_cidrs_default" {
+  command = plan
+
+  assert {
+    condition     = length(var.cribl_allowed_cidrs) == 0
+    error_message = "cribl_allowed_cidrs should default to []"
   }
 }

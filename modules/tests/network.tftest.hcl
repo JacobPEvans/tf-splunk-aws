@@ -10,6 +10,16 @@
 # the NAT module are wired correctly as a proxy for routing readiness.
 
 mock_provider "aws" {}
+mock_provider "random" {}
+mock_provider "tls" {}
+mock_provider "http" {
+  mock_data "http" {
+    defaults = {
+      status_code   = 200
+      response_body = ""
+    }
+  }
+}
 
 # Override non-network child modules so we can test the root module's
 # network wiring in isolation.
@@ -21,6 +31,9 @@ override_module {
     splunk_instance_profile_name = "mock-splunk-instance-profile"
     splunk_iam_role_arn          = "arn:aws:iam::123456789012:role/mock-splunk-role"
     splunk_password_ssm_name     = "/dev/splunk/admin-password"
+    internal_security_group_id   = "sg-00000000000000003"
+    cribl_security_group_id      = "sg-00000000000000004"
+    cribl_instance_profile_name  = "mock-cribl-instance-profile"
   }
 }
 
@@ -47,16 +60,28 @@ override_module {
   }
 }
 
+override_module {
+  target = module.cribl
+  outputs = {
+    cribl_stream_instance_id = "i-00000000000000003"
+    cribl_stream_private_ip  = "10.0.10.30"
+    cribl_stream_public_ip   = null
+    cribl_stream_web_url     = "http://10.0.10.30:4200"
+    cribl_edge_instance_id   = "i-00000000000000004"
+    cribl_edge_private_ip    = "10.0.10.40"
+    cribl_edge_public_ip     = null
+  }
+}
+
 # Shared valid defaults for all runs
 variables {
-  environment           = "dev"
-  vpc_cidr              = "10.0.0.0/16"
-  availability_zones    = ["us-east-2a", "us-east-2b"]
-  public_subnet_cidrs   = ["10.0.1.0/24", "10.0.2.0/24"]
-  private_subnet_cidrs  = ["10.0.10.0/24", "10.0.20.0/24"]
-  nat_instance_type     = "t4g.nano"
-  splunk_instance_type  = "t3a.small"
-  splunk_admin_password = "mock-password-value"
+  environment          = "dev"
+  vpc_cidr             = "10.0.0.0/16"
+  availability_zones   = ["us-east-2a", "us-east-2b"]
+  public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+  private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
+  nat_instance_type    = "t4g.nano"
+  splunk_instance_type = "t3a.small"
 }
 
 # --- Plan succeeds with valid network inputs ---

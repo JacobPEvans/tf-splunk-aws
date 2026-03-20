@@ -6,6 +6,7 @@ include "root" {
 locals {
   network_public_ip = get_env("NETWORK_PUBLIC_IP_ADDRESS", "")
   allowed_cidrs     = local.network_public_ip != "" ? ["${local.network_public_ip}/32"] : []
+  splunk_password   = get_env("SPLUNK_PASSWORD", "")
 }
 
 inputs = {
@@ -30,12 +31,16 @@ inputs = {
   # Public access: place Splunk in public subnet with public IP
   splunk_public_access = true
 
+  # Cribl Stream + Edge
+  enable_cribl             = true
+  management_allowed_cidrs = local.allowed_cidrs
+  cribl_allowed_cidrs      = local.allowed_cidrs
+
   # CIDRs from Doppler NETWORK_PUBLIC_IP_ADDRESS (iac-conf-mgmt/prd)
   # Never commit real IPs — empty default disables external access if env var unset
   web_allowed_cidrs = local.allowed_cidrs
   hec_allowed_cidrs = local.allowed_cidrs
 
-  # Splunk admin password from Doppler SPLUNK_PASSWORD (iac-conf-mgmt/prd)
-  # Empty default intentionally fails the >= 8 char validation when env var is not set
-  splunk_admin_password = get_env("SPLUNK_PASSWORD", "")
+  # Splunk admin password: uses Doppler SPLUNK_PASSWORD if set, otherwise auto-generates
+  splunk_admin_password = local.splunk_password != "" ? local.splunk_password : null
 }

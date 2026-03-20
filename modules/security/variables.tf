@@ -56,3 +56,21 @@ variable "smartstore_bucket_arn" {
   description = "ARN of the S3 bucket used for Splunk SmartStore remote storage"
   type        = string
 }
+
+variable "enable_cribl" {
+  description = "Enable Cribl Stream and Edge resources (security groups, IAM)"
+  type        = bool
+  default     = true
+}
+
+variable "management_allowed_cidrs" {
+  description = "CIDR blocks for management ports (RDP 3389, Splunk mgmt 8089) — always restricted, never affected by allow_all_ips. SSH is controlled by ssh_allowed_cidrs."
+  type        = list(string)
+  default     = []
+}
+
+variable "cribl_allowed_cidrs" {
+  description = "CIDR blocks for Cribl ports (4200 Web/leader, 9997 data ingest) — affected by allow_all_ips"
+  type        = list(string)
+  default     = []
+}

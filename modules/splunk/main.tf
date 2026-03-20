@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.0"
     }
+    http = {
+      source  = "hashicorp/http"
+      version = "~> 3.0"
+    }
   }
 }
 
@@ -23,6 +27,15 @@ locals {
   }
   # rate() requires singular "hour" for value 1, plural "hours" for all others
   lifecycle_schedule_unit = var.lifecycle_interval_hours == 1 ? "hour" : "hours"
+
+  # Download URL — validated at plan/apply time via data "http"
+  splunk_pkg_url = "https://download.splunk.com/products/splunk/releases/${var.splunk_version}/linux/splunk-${var.splunk_version}-${var.splunk_build}-linux-amd64.tgz"
+}
+
+# Pre-deployment validation: verify Splunk download URL exists
+data "http" "splunk_pkg" {
+  url    = local.splunk_pkg_url
+  method = "HEAD"
 }
 
 # User data script for Splunk instance
@@ -46,12 +59,11 @@ locals {
     # Create splunk user
     useradd -r -m -s /bin/bash splunk
 
-    # Download and install Splunk
+    # Download and install Splunk (URL pre-validated by check block)
     cd /opt
     SPLUNK_PKG="splunk-${var.splunk_version}-${var.splunk_build}-linux-amd64.tgz"
-    SPLUNK_BASE_URL="https://download.splunk.com/products/splunk/releases/${var.splunk_version}/linux"
-    wget -O "$${SPLUNK_PKG}" "$${SPLUNK_BASE_URL}/$${SPLUNK_PKG}"
-    wget -O "$${SPLUNK_PKG}.sha512" "$${SPLUNK_BASE_URL}/$${SPLUNK_PKG}.sha512"
+    wget -O "$${SPLUNK_PKG}" "${local.splunk_pkg_url}"
+    wget -O "$${SPLUNK_PKG}.sha512" "${local.splunk_pkg_url}.sha512"
     sha512sum -c "$${SPLUNK_PKG}.sha512" || { echo "ERROR: Splunk package checksum mismatch. Aborting." >&2; exit 1; }
     tar -xzf "$${SPLUNK_PKG}"
     chown -R splunk:splunk /opt/splunk
@@ -125,7 +137,7 @@ resource "aws_instance" "splunk" {
   ami                         = var.ami_id
   instance_type               = var.splunk_instance_type
   key_name                    = var.key_pair_name
-  vpc_security_group_ids      = [var.splunk_security_group_id]
+  vpc_security_group_ids      = var.splunk_security_group_ids
   subnet_id                   = var.subnet_ids[0]
   associate_public_ip_address = var.associate_public_ip_address
   iam_instance_profile        = var.splunk_instance_profile_name
@@ -161,6 +173,10 @@ resource "aws_instance" "splunk" {
 
   lifecycle {
     create_before_destroy = true
+    precondition {
+      condition     = data.http.splunk_pkg.status_code == 200
+      error_message = "Splunk package not found at ${local.splunk_pkg_url} (HTTP ${data.http.splunk_pkg.status_code}). Check splunk_version and splunk_build."
+    }
   }
 }
 

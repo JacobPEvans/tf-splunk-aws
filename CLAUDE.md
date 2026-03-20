@@ -68,6 +68,59 @@ direnv allow    # one-time per worktree
 nix develop
 ```
 
+## Claude Code with AWS Credentials
+
+Claude Code cannot access the macOS keychain for `aws-vault` prompts. To run
+Terragrunt operations (init, plan, apply, destroy) from Claude, **start the
+session with credentials already injected**:
+
+```bash
+# Launch Claude Code with AWS credentials pre-loaded
+aws-vault exec tf-splunk-aws -- doppler run -- claude
+
+# All Bash tool calls inside the session inherit AWS_* and Doppler env vars.
+# No aws-vault or doppler wrapper needed on individual commands:
+#   terragrunt init
+#   terragrunt plan
+#   terragrunt apply
+#   terragrunt destroy -auto-approve
+```
+
+STS credentials last ~1 hour. If they expire mid-session, exit and re-launch.
+
+### Post-Apply: Always Show Cost and Credentials
+
+After **every** `terragrunt apply` (or any change to this module), always run and
+display these outputs to the user:
+
+```bash
+cd terragrunt/dev/
+terragrunt output -json estimated_cost | jq .
+terragrunt output -json access_credentials | jq .
+```
+
+Then **verify all service URLs are live** before reporting success:
+
+```bash
+# Check Splunk Web (expect HTTP 303 redirect to login)
+curl -sf -o /dev/null -w '%{http_code}' http://<splunk_ip>:8000 || echo "SPLUNK DOWN"
+
+# Check Cribl Stream Web UI (expect HTTP 200 or 302)
+curl -sf -o /dev/null -w '%{http_code}' http://<cribl_stream_ip>:4200 || echo "CRIBL STREAM DOWN"
+```
+
+Services may take 2-5 minutes to boot after apply. Retry up to 3 times with 30-second
+intervals before reporting a service as down. Report results alongside the cost/credentials output.
+
+Offline operations (validate, test) never need credentials — run them directly:
+
+```bash
+cd modules/
+tofu init -backend=false
+tofu validate
+tofu test -no-color
+```
+
 ## Commands
 
 ### Prerequisites

@@ -89,12 +89,24 @@ resource "aws_security_group" "splunk" {
     cidr_blocks = var.vpc_cidr_blocks
   }
 
-  # Splunk Management (8089)
+  # Splunk Management (8089) — VPC internal
   ingress {
     from_port   = 8089
     to_port     = 8089
     protocol    = "tcp"
     cidr_blocks = var.vpc_cidr_blocks
+  }
+
+  # Splunk Management (8089) — external restricted access
+  dynamic "ingress" {
+    for_each = length(var.management_allowed_cidrs) > 0 ? [1] : []
+    content {
+      from_port   = 8089
+      to_port     = 8089
+      protocol    = "tcp"
+      cidr_blocks = var.management_allowed_cidrs
+      description = "Splunk mgmt (external, always restricted)"
+    }
   }
 
   # Splunk Web (8000) from external CIDRs - only created when web_allowed_cidrs is non-empty or allow_all_ips
@@ -195,7 +207,17 @@ resource "aws_iam_role_policy" "splunk_instance" {
           "ssm:SendCommand",
           "ssm:ListCommands",
           "ssm:ListCommandInvocations",
-          "ssm:DescribeInstanceInformation"
+          "ssm:DescribeInstanceInformation",
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel",
+          "ec2messages:AcknowledgeMessage",
+          "ec2messages:DeleteMessage",
+          "ec2messages:FailMessage",
+          "ec2messages:GetEndpoint",
+          "ec2messages:GetMessages",
+          "ec2messages:SendReply"
         ]
         Resource = "*"
       },
@@ -245,5 +267,167 @@ resource "aws_iam_instance_profile" "splunk" {
 
   tags = merge(local.common_tags, {
     Name = "${var.environment}-splunk-instance-profile"
+  })
+}
+
+# Internal Cluster Security Group — self-referencing, all VMs fully open to each other
+resource "aws_security_group" "internal" {
+  count = var.enable_cribl ? 1 : 0
+
+  name        = "${var.environment}-internal-cluster-sg"
+  description = "All ports open between Splunk, Cribl Stream, and Cribl Edge instances"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    self      = true
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${var.environment}-internal-cluster-sg"
+  })
+}
+
+# Cribl Security Group — external access to Cribl ports
+resource "aws_security_group" "cribl" {
+  count = var.enable_cribl ? 1 : 0
+
+  name        = "${var.environment}-cribl-sg"
+  description = "Security group for Cribl Stream and Edge instances"
+  vpc_id      = var.vpc_id
+
+  # Cribl ports (4200: Web UI + leader/worker comms; 9997: data ingest)
+  dynamic "ingress" {
+    for_each = var.allow_all_ips || length(var.cribl_allowed_cidrs) > 0 ? {
+      "4200" = "Cribl Web UI and leader/worker comms"
+      "9997" = "Cribl data ingest"
+    } : {}
+    content {
+      from_port   = tonumber(ingress.key)
+      to_port     = tonumber(ingress.key)
+      protocol    = "tcp"
+      cidr_blocks = var.allow_all_ips ? ["0.0.0.0/0"] : var.cribl_allowed_cidrs
+      description = ingress.value
+    }
+  }
+
+  # RDP (3389) — always restricted to management CIDRs
+  dynamic "ingress" {
+    for_each = length(var.management_allowed_cidrs) > 0 ? [1] : []
+    content {
+      from_port   = 3389
+      to_port     = 3389
+      protocol    = "tcp"
+      cidr_blocks = var.management_allowed_cidrs
+      description = "RDP access (always restricted)"
+    }
+  }
+
+  # SSH (22) — same pattern as existing instances
+  dynamic "ingress" {
+    for_each = length(var.ssh_allowed_cidrs) > 0 ? [1] : []
+    content {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = var.ssh_allowed_cidrs
+      description = "SSH access (restricted)"
+    }
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${var.environment}-cribl-sg"
+  })
+}
+
+# IAM Role for Cribl Instances
+resource "aws_iam_role" "cribl_instance" {
+  count = var.enable_cribl ? 1 : 0
+
+  name = "${var.environment}-cribl-instance-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = merge(local.common_tags, {
+    Name = "${var.environment}-cribl-instance-role"
+  })
+}
+
+# IAM Policy for Cribl Instances (SSM management only — no S3 SmartStore access)
+resource "aws_iam_role_policy" "cribl_instance" {
+  count = var.enable_cribl ? 1 : 0
+
+  name = "${var.environment}-cribl-instance-policy"
+  role = aws_iam_role.cribl_instance[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:UpdateInstanceInformation",
+          "ssm:SendCommand",
+          "ssm:ListCommands",
+          "ssm:ListCommandInvocations",
+          "ssm:DescribeInstanceInformation",
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel",
+          "ec2messages:AcknowledgeMessage",
+          "ec2messages:DeleteMessage",
+          "ec2messages:FailMessage",
+          "ec2messages:GetEndpoint",
+          "ec2messages:GetMessages",
+          "ec2messages:SendReply"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = "kms:Decrypt"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# IAM Instance Profile for Cribl
+resource "aws_iam_instance_profile" "cribl" {
+  count = var.enable_cribl ? 1 : 0
+
+  name = "${var.environment}-cribl-instance-profile"
+  role = aws_iam_role.cribl_instance[0].name
+
+  tags = merge(local.common_tags, {
+    Name = "${var.environment}-cribl-instance-profile"
   })
 }

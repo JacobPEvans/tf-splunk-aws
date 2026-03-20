@@ -65,13 +65,14 @@ variable "splunk_data_volume_size" {
 }
 
 variable "splunk_admin_password" {
-  description = "Admin password for Splunk (use strong password)"
+  description = "Admin password for Splunk. If null or empty, a random 24-char password is generated per-build."
   type        = string
   sensitive   = true
+  default     = null
 
   validation {
-    condition     = length(var.splunk_admin_password) >= 8
-    error_message = "Splunk admin password must be at least 8 characters."
+    condition     = var.splunk_admin_password == null || var.splunk_admin_password == "" || length(var.splunk_admin_password) >= 8
+    error_message = "Splunk admin password must be at least 8 characters when provided."
   }
 }
 
@@ -132,6 +133,46 @@ variable "ssh_allowed_cidrs" {
     ])
     error_message = "Each ssh_allowed_cidrs entry must be a valid CIDR block, e.g. 203.0.113.0/24 or 0.0.0.0/0."
   }
+}
+
+variable "enable_cribl" {
+  description = "Enable Cribl Stream and Edge instances"
+  type        = bool
+  default     = true
+}
+
+variable "cribl_stream_instance_type" {
+  description = "Instance type for Cribl Stream (must be x86_64)"
+  type        = string
+  default     = "t3a.small"
+
+  validation {
+    condition     = !can(regex("(^a1\\.|[0-9]+g[a-z]*\\.)", var.cribl_stream_instance_type))
+    error_message = "cribl_stream_instance_type must be x86_64. ARM/Graviton families are not supported."
+  }
+}
+
+variable "cribl_edge_instance_type" {
+  description = "Instance type for Cribl Edge Windows instance (must be x86_64)"
+  type        = string
+  default     = "t3a.medium"
+
+  validation {
+    condition     = !can(regex("(^a1\\.|[0-9]+g[a-z]*\\.)", var.cribl_edge_instance_type))
+    error_message = "cribl_edge_instance_type must be x86_64. ARM/Graviton families are not supported."
+  }
+}
+
+variable "management_allowed_cidrs" {
+  description = "CIDR blocks for management ports (RDP 3389, Splunk mgmt 8089) — always restricted, never affected by allow_all_ips. SSH is controlled by ssh_allowed_cidrs."
+  type        = list(string)
+  default     = []
+}
+
+variable "cribl_allowed_cidrs" {
+  description = "CIDR blocks for Cribl ports (4200 Web/leader, 9997 data ingest) — affected by allow_all_ips"
+  type        = list(string)
+  default     = []
 }
 
 variable "enable_auto_lifecycle" {

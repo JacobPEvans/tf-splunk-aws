@@ -8,11 +8,55 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
+    http = {
+      source  = "hashicorp/http"
+      version = "~> 3.0"
+    }
   }
 }
 
 # AWS account identity - used for unique S3 bucket naming
 data "aws_caller_identity" "current" {}
+
+# Auto-generated credentials for ephemeral dev/DR environments
+# All secrets are generated per-build and destroyed with the environment
+resource "random_password" "splunk_admin" {
+  length  = 24
+  special = true
+}
+
+resource "random_password" "windows_admin" {
+  length           = 24
+  special          = true
+  override_special = "!@#$%&*"
+  min_upper        = 2
+  min_lower        = 2
+  min_numeric      = 2
+  min_special      = 2
+}
+
+resource "tls_private_key" "access" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "generated" {
+  key_name   = "${var.environment}-generated-key"
+  public_key = tls_private_key.access.public_key_openssh
+}
+
+locals {
+  effective_splunk_password = var.splunk_admin_password != null && var.splunk_admin_password != "" ? var.splunk_admin_password : random_password.splunk_admin.result
+  effective_key_pair_name   = coalesce(var.key_pair_name, aws_key_pair.generated.key_name)
+}
 
 # ARM64 AMI for NAT instance (t4g.nano — Graviton)
 data "aws_ami" "amazon_linux" {
@@ -43,6 +87,27 @@ data "aws_ami" "amazon_linux_x86" {
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
+  }
+}
+
+# Windows Server 2022 AMI for Cribl Edge
+data "aws_ami" "windows_2022" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["Windows_Server-2022-English-Full-Base-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
   }
 }
 
@@ -124,16 +189,19 @@ module "network" {
 module "security" {
   source = "./security"
 
-  environment           = var.environment
-  vpc_id                = module.network.vpc_id
-  vpc_cidr_blocks       = [module.network.vpc_cidr_block]
-  private_subnet_cidrs  = var.private_subnet_cidrs
-  splunk_admin_password = var.splunk_admin_password
-  ssh_allowed_cidrs     = var.ssh_allowed_cidrs
-  hec_allowed_cidrs     = var.hec_allowed_cidrs
-  web_allowed_cidrs     = var.web_allowed_cidrs
-  allow_all_ips         = var.allow_all_ips
-  smartstore_bucket_arn = aws_s3_bucket.smartstore.arn
+  environment              = var.environment
+  vpc_id                   = module.network.vpc_id
+  vpc_cidr_blocks          = [module.network.vpc_cidr_block]
+  private_subnet_cidrs     = var.private_subnet_cidrs
+  splunk_admin_password    = local.effective_splunk_password
+  ssh_allowed_cidrs        = var.ssh_allowed_cidrs
+  hec_allowed_cidrs        = var.hec_allowed_cidrs
+  web_allowed_cidrs        = var.web_allowed_cidrs
+  allow_all_ips            = var.allow_all_ips
+  smartstore_bucket_arn    = aws_s3_bucket.smartstore.arn
+  enable_cribl             = var.enable_cribl
+  management_allowed_cidrs = var.management_allowed_cidrs
+  cribl_allowed_cidrs      = var.cribl_allowed_cidrs
 }
 
 # Compute Module (NAT Instance)
@@ -142,7 +210,7 @@ module "compute" {
 
   environment           = var.environment
   nat_instance_type     = var.nat_instance_type
-  key_pair_name         = var.key_pair_name
+  key_pair_name         = local.effective_key_pair_name
   nat_security_group_id = module.security.nat_security_group_id
   public_subnet_ids     = module.network.public_subnet_ids
   ami_id                = data.aws_ami.amazon_linux.id
@@ -152,13 +220,16 @@ module "compute" {
 module "splunk" {
   source = "./splunk"
 
-  environment                  = var.environment
-  splunk_instance_type         = var.splunk_instance_type
-  splunk_root_volume_size      = var.splunk_root_volume_size
-  splunk_data_volume_size      = var.splunk_data_volume_size
-  splunk_password_ssm_name     = module.security.splunk_password_ssm_name
-  key_pair_name                = var.key_pair_name
-  splunk_security_group_id     = module.security.splunk_security_group_id
+  environment              = var.environment
+  splunk_instance_type     = var.splunk_instance_type
+  splunk_root_volume_size  = var.splunk_root_volume_size
+  splunk_data_volume_size  = var.splunk_data_volume_size
+  splunk_password_ssm_name = module.security.splunk_password_ssm_name
+  key_pair_name            = local.effective_key_pair_name
+  splunk_security_group_ids = concat(
+    [module.security.splunk_security_group_id],
+    var.enable_cribl ? [module.security.internal_security_group_id] : []
+  )
   subnet_ids                   = var.splunk_public_access ? module.network.public_subnet_ids : module.network.private_subnet_ids
   associate_public_ip_address  = var.splunk_public_access
   splunk_instance_profile_name = module.security.splunk_instance_profile_name
@@ -169,6 +240,24 @@ module "splunk" {
   enable_auto_lifecycle        = var.enable_auto_lifecycle
   auto_shutdown_minutes        = var.auto_shutdown_minutes
   lifecycle_interval_hours     = var.lifecycle_interval_hours
+}
+
+# Cribl Module (Stream + Edge)
+module "cribl" {
+  source = "./cribl"
+
+  environment                 = var.environment
+  enable_cribl                = var.enable_cribl
+  cribl_stream_instance_type  = var.cribl_stream_instance_type
+  cribl_edge_instance_type    = var.cribl_edge_instance_type
+  key_pair_name               = local.effective_key_pair_name
+  windows_admin_password      = random_password.windows_admin.result
+  security_group_ids          = var.enable_cribl ? [module.security.cribl_security_group_id, module.security.internal_security_group_id] : []
+  subnet_ids                  = var.splunk_public_access ? module.network.public_subnet_ids : module.network.private_subnet_ids
+  associate_public_ip_address = var.splunk_public_access
+  instance_profile_name       = var.enable_cribl ? module.security.cribl_instance_profile_name : null
+  linux_ami_id                = data.aws_ami.amazon_linux_x86.id
+  windows_ami_id              = data.aws_ami.windows_2022.id
 }
 
 # Route private subnet traffic through NAT instance

@@ -24,3 +24,18 @@ output "splunk_password_ssm_name" {
   description = "SSM Parameter Store name for Splunk admin password"
   value       = aws_ssm_parameter.splunk_admin_password.name
 }
+
+output "internal_security_group_id" {
+  description = "ID of the internal cluster security group (null when Cribl disabled)"
+  value       = try(aws_security_group.internal[0].id, null)
+}
+
+output "cribl_security_group_id" {
+  description = "ID of the Cribl security group (null when Cribl disabled)"
+  value       = try(aws_security_group.cribl[0].id, null)
+}
+
+output "cribl_instance_profile_name" {
+  description = "Name of the Cribl IAM instance profile (null when Cribl disabled)"
+  value       = try(aws_iam_instance_profile.cribl[0].name, null)
+}

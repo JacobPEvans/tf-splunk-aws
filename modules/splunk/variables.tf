@@ -34,9 +34,9 @@ variable "key_pair_name" {
   default     = null
 }
 
-variable "splunk_security_group_id" {
-  description = "Security group ID for Splunk instance"
-  type        = string
+variable "splunk_security_group_ids" {
+  description = "Security group IDs for Splunk instance"
+  type        = list(string)
 }
 
 variable "subnet_ids" {

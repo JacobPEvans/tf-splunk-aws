@@ -6,6 +6,16 @@
 # All runs use mock providers - no AWS credentials needed.
 
 mock_provider "aws" {}
+mock_provider "random" {}
+mock_provider "tls" {}
+mock_provider "http" {
+  mock_data "http" {
+    defaults = {
+      status_code   = 200
+      response_body = ""
+    }
+  }
+}
 
 # Override compute and splunk modules to isolate security concerns.
 override_module {
@@ -31,16 +41,28 @@ override_module {
   }
 }
 
+override_module {
+  target = module.cribl
+  outputs = {
+    cribl_stream_instance_id = "i-00000000000000003"
+    cribl_stream_private_ip  = "10.0.10.30"
+    cribl_stream_public_ip   = null
+    cribl_stream_web_url     = "http://10.0.10.30:4200"
+    cribl_edge_instance_id   = "i-00000000000000004"
+    cribl_edge_private_ip    = "10.0.10.40"
+    cribl_edge_public_ip     = null
+  }
+}
+
 # Shared valid defaults for all runs
 variables {
-  environment           = "dev"
-  vpc_cidr              = "10.0.0.0/16"
-  availability_zones    = ["us-east-2a", "us-east-2b"]
-  public_subnet_cidrs   = ["10.0.1.0/24", "10.0.2.0/24"]
-  private_subnet_cidrs  = ["10.0.10.0/24", "10.0.20.0/24"]
-  nat_instance_type     = "t4g.nano"
-  splunk_instance_type  = "t3a.small"
-  splunk_admin_password = "mock-password-value"
+  environment          = "dev"
+  vpc_cidr             = "10.0.0.0/16"
+  availability_zones   = ["us-east-2a", "us-east-2b"]
+  public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+  private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
+  nat_instance_type    = "t4g.nano"
+  splunk_instance_type = "t3a.small"
 }
 
 # --- Plan succeeds with valid security inputs ---
@@ -159,5 +181,53 @@ run "allow_all_ips_can_be_enabled" {
   assert {
     condition     = var.allow_all_ips == true
     error_message = "allow_all_ips=true should be accepted"
+  }
+}
+
+# --- Internal cluster SG is created when Cribl enabled (default) ---
+
+run "internal_sg_created_when_cribl_enabled" {
+  command = plan
+
+  assert {
+    condition     = output.internal_security_group_id != null
+    error_message = "internal_security_group_id must be non-null when enable_cribl defaults to true"
+  }
+}
+
+# --- Cribl SG is created when Cribl enabled (default) ---
+
+run "cribl_sg_created_when_cribl_enabled" {
+  command = plan
+
+  assert {
+    condition     = output.cribl_security_group_id != null
+    error_message = "cribl_security_group_id must be non-null when enable_cribl defaults to true"
+  }
+}
+
+# --- management_allowed_cidrs defaults to empty ---
+
+run "management_allowed_cidrs_defaults_to_empty" {
+  command = plan
+
+  assert {
+    condition     = length(var.management_allowed_cidrs) == 0
+    error_message = "management_allowed_cidrs should default to []"
+  }
+}
+
+# --- Plan succeeds with management CIDRs provided ---
+
+run "management_cidrs_accepted" {
+  command = plan
+
+  variables {
+    management_allowed_cidrs = ["10.0.0.0/8"]
+  }
+
+  assert {
+    condition     = length(var.management_allowed_cidrs) > 0
+    error_message = "management_allowed_cidrs should accept provided CIDRs"
   }
 }
