@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.0](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.10.0...v0.11.0) (2026-03-20)
+
+
+### Features
+
+* **cribl:** add optional Cribl Stream and Edge instances ([#78](https://github.com/JacobPEvans/tf-splunk-aws/issues/78)) ([d9c6a6d](https://github.com/JacobPEvans/tf-splunk-aws/commit/d9c6a6d809b1e6facfd35c82d5874811e9e512d1))
+
 ## [0.10.0](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.9.0...v0.10.0) (2026-03-19)
 
 
