@@ -52,6 +52,7 @@
               trivy
 
               # === Cloud & Development ===
+              aws-vault
               awscli2
               git
               python3
