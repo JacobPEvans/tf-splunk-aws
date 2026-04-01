@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.1](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.11.0...v0.11.1) (2026-04-01)
+
+
+### Bug Fixes
+
+* use nix-devenv terraform shell instead of local flake.nix ([#87](https://github.com/JacobPEvans/tf-splunk-aws/issues/87)) ([6b93b0f](https://github.com/JacobPEvans/tf-splunk-aws/commit/6b93b0fd1f0e5d57fc08d95346098cf550c4c7b7))
+
 ## [0.11.0](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.10.0...v0.11.0) (2026-03-20)
 
 
