@@ -57,7 +57,8 @@ Data persists in S3 even when instance is stopped — searchable on-demand via s
 
 ## Dev Shell Activation
 
-This repo uses Nix flakes + direnv for reproducible tooling:
+This repo uses the shared [nix-devenv terraform shell](https://github.com/JacobPEvans/nix-devenv/tree/main/shells/terraform)
+via direnv for reproducible tooling:
 
 ```bash
 # Automatic (recommended): direnv activates on cd
@@ -65,7 +66,7 @@ cd ~/git/tf-splunk-aws/main/
 direnv allow    # one-time per worktree
 
 # Manual:
-nix develop
+nix develop "github:JacobPEvans/nix-devenv?dir=shells/terraform"
 ```
 
 ## Claude Code with AWS Credentials
