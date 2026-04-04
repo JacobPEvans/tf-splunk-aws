@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.2](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.11.1...v0.11.2) (2026-04-04)
+
+
+### Bug Fixes
+
+* remove claude-review workflow — replaced by Gemini + Copilot ([#91](https://github.com/JacobPEvans/tf-splunk-aws/issues/91)) ([a19bd71](https://github.com/JacobPEvans/tf-splunk-aws/commit/a19bd715508c2ff518841141d5af07193cb1740e))
+
 ## [0.11.1](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.11.0...v0.11.1) (2026-04-01)
 
 
