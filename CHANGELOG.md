@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.12.0](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.11.2...v0.12.0) (2026-04-04)
+
+
+### Features
+
+* add gh-aw agentic workflows and sync ci/copilot/renovate patterns ([#47](https://github.com/JacobPEvans/tf-splunk-aws/issues/47)) ([85b7937](https://github.com/JacobPEvans/tf-splunk-aws/commit/85b79370ead8756982edc0f443365bb6e0b9dafc))
+* add nix dev shell and align terragrunt with terraform-proxmox patterns ([#69](https://github.com/JacobPEvans/tf-splunk-aws/issues/69)) ([a95153f](https://github.com/JacobPEvans/tf-splunk-aws/commit/a95153f933de8bdef0eb3bb85f2742d0565df097))
+* comprehensive project cleanup and standardization ([dc420c9](https://github.com/JacobPEvans/tf-splunk-aws/commit/dc420c94549332aa27329237c9578face2eb29ea))
+* **cribl:** add optional Cribl Stream and Edge instances ([#78](https://github.com/JacobPEvans/tf-splunk-aws/issues/78)) ([d9c6a6d](https://github.com/JacobPEvans/tf-splunk-aws/commit/d9c6a6d809b1e6facfd35c82d5874811e9e512d1))
+* **dev:** enable public Splunk access and fix terragrunt config ([#71](https://github.com/JacobPEvans/tf-splunk-aws/issues/71)) ([88944fd](https://github.com/JacobPEvans/tf-splunk-aws/commit/88944fd4086b1f0f02d6543a6fc63c2ceceadbc3))
+* implement cost-optimized NAT instance and complete Terragrunt module structure ([d8729b7](https://github.com/JacobPEvans/tf-splunk-aws/commit/d8729b7f186a38d41b93011f9ce6f1c865be467e))
+* migrate to Graviton ARM64 (t4g) instances ([#40](https://github.com/JacobPEvans/tf-splunk-aws/issues/40)) ([c1e709d](https://github.com/JacobPEvans/tf-splunk-aws/commit/c1e709d24e16a6e7a671601a9a426e071c2674ba))
+* Renovate trusted-publisher allowlist with Tier 1 + Tier 2 rules ([#34](https://github.com/JacobPEvans/tf-splunk-aws/issues/34)) ([114d79b](https://github.com/JacobPEvans/tf-splunk-aws/commit/114d79bb0b278704baca5a96ce4cf28cebcf742f))
+* **renovate:** extend shared preset, remove duplicated rules ([9e8f307](https://github.com/JacobPEvans/tf-splunk-aws/commit/9e8f30791420a68128dbc7366fb9fb9e667a91af))
+* repository standardization, CI/CD, and native tests ([#28](https://github.com/JacobPEvans/tf-splunk-aws/issues/28)) ([117a494](https://github.com/JacobPEvans/tf-splunk-aws/commit/117a4947d75b4e4c9eb48067b1bdbc3c164bf1a9))
+* SmartStore S3 backend + auto-lifecycle management ([#41](https://github.com/JacobPEvans/tf-splunk-aws/issues/41)) ([8dacba1](https://github.com/JacobPEvans/tf-splunk-aws/commit/8dacba14a23bd13cf03d234207189128977054c9))
+* **splunk:** add optional public subnet placement ([#68](https://github.com/JacobPEvans/tf-splunk-aws/issues/68)) ([6b516f6](https://github.com/JacobPEvans/tf-splunk-aws/commit/6b516f68e4f214a533470251c2dd828e03d2ee40))
+* standardize module naming to 'network' instead of 'networking' ([9e75704](https://github.com/JacobPEvans/tf-splunk-aws/commit/9e75704c94c88c10d8859b4682af504efa674767))
+
+
+### Bug Fixes
+
+* **claude-review:** fix concurrency collision + add review limit ([#38](https://github.com/JacobPEvans/tf-splunk-aws/issues/38)) ([943d1fd](https://github.com/JacobPEvans/tf-splunk-aws/commit/943d1fd834816d0d09cb9c4fab413b6c08519522))
+* migrate Splunk password to SSM and restrict SSH CIDRs ([#39](https://github.com/JacobPEvans/tf-splunk-aws/issues/39)) ([27db572](https://github.com/JacobPEvans/tf-splunk-aws/commit/27db572b48c27994e45b6c48f04fa59f614f9923))
+* remove claude-review workflow — replaced by Gemini + Copilot ([#91](https://github.com/JacobPEvans/tf-splunk-aws/issues/91)) ([a19bd71](https://github.com/JacobPEvans/tf-splunk-aws/commit/a19bd715508c2ff518841141d5af07193cb1740e))
+* **renovate:** add config:recommended base preset ([#63](https://github.com/JacobPEvans/tf-splunk-aws/issues/63)) ([378d3dd](https://github.com/JacobPEvans/tf-splunk-aws/commit/378d3dd94aa50d11b1b968e9d133179ec0446184))
+* resolve critical infrastructure bugs and security issues ([#29](https://github.com/JacobPEvans/tf-splunk-aws/issues/29)) ([e7d3812](https://github.com/JacobPEvans/tf-splunk-aws/commit/e7d3812c7407c846f70fee1fec8136decdbc8b8b))
+* **splunk:** correct user_data shell variable escaping ([#73](https://github.com/JacobPEvans/tf-splunk-aws/issues/73)) ([075dc93](https://github.com/JacobPEvans/tf-splunk-aws/commit/075dc93ee728f84e42080c01f7a33cf51b3da456))
+* **splunk:** switch to x86_64 — no public ARM64 packages available ([#72](https://github.com/JacobPEvans/tf-splunk-aws/issues/72)) ([d4c0bf1](https://github.com/JacobPEvans/tf-splunk-aws/commit/d4c0bf1ac5a9bc6cb111d5c21ae6c95151290993))
+* standardize release-please workflow and config ([eec76e2](https://github.com/JacobPEvans/tf-splunk-aws/commit/eec76e219b4ad73c76312ca275e535d61160c974))
+* use nix-devenv terraform shell instead of local flake.nix ([#87](https://github.com/JacobPEvans/tf-splunk-aws/issues/87)) ([6b93b0f](https://github.com/JacobPEvans/tf-splunk-aws/commit/6b93b0fd1f0e5d57fc08d95346098cf550c4c7b7))
+
 ## [0.11.2](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.11.1...v0.11.2) (2026-04-04)
 
 
