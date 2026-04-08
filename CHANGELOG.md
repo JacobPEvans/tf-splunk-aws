@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.12.0...v0.13.0) (2026-04-08)
+
+
+### Features
+
+* add AI merge gate ([#95](https://github.com/JacobPEvans/tf-splunk-aws/issues/95)) ([782201e](https://github.com/JacobPEvans/tf-splunk-aws/commit/782201ed3a19fa1a0691f7d9994387518b5b1bfa))
+
 ## [0.12.0](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.11.2...v0.12.0) (2026-04-04)
 
 
