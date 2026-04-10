@@ -19,5 +19,5 @@ concurrency:
 
 jobs:
   review:
-    uses: JacobPEvans/ai-workflows/.github/workflows/final-pr-review.yml@v0.11.4
+    uses: JacobPEvans/ai-workflows/.github/workflows/final-pr-review.yml@v0.12.0
     secrets: inherit
