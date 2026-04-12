@@ -1,15 +1,21 @@
 {
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
   "version": "0.2",
   "language": "en",
+  "import": [
+    "https://raw.githubusercontent.com/JacobPEvans/.github/main/cspell/base.json"
+  ],
   "words": [
-    "agentic",
-    "backdoors",
-    "exfiltration",
-    "TFPATH",
-    "toolsets",
-    "tinyurl",
-    "unshallow",
-    "unsanitized",
-    "useast"
-  ]
+    "anson",
+    "cachemanager",
+    "ededed",
+    "fbca",
+    "mstsc",
+    "postrouting",
+    "smartstore",
+    "tfpath",
+    "useast",
+    "wineof"
+  ],
+  "ignorePaths": [".git", "node_modules", "*.lock", "**/.terraform.lock.hcl"]
 }
