@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.0](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.13.0...v0.14.0) (2026-04-12)
+
+
+### Features
+
+* **cspell:** migrate to shared org-wide dictionary hierarchy ([e43db54](https://github.com/JacobPEvans/tf-splunk-aws/commit/e43db54dd1a9f9118ff7490d9254f2c137f20b72))
+
 ## [0.13.0](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.12.0...v0.13.0) (2026-04-08)
 
 
