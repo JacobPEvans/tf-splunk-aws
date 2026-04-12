@@ -6,10 +6,12 @@
     "https://raw.githubusercontent.com/JacobPEvans/.github/main/cspell/base.json"
   ],
   "words": [
+    "agentics",
     "anson",
     "cachemanager",
     "ededed",
     "fbca",
+    "githubnext",
     "mstsc",
     "postrouting",
     "smartstore",
@@ -17,5 +19,5 @@
     "useast",
     "wineof"
   ],
-  "ignorePaths": [".git", "node_modules", "*.lock", "**/.terraform.lock.hcl"]
+  "ignorePaths": [".git", ".github/aw", "node_modules", "*.lock", "*.lock.yml", "**/.terraform.lock.hcl"]
 }
