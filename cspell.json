@@ -11,14 +11,11 @@
     "ededed",
     "fbca",
     "mstsc",
-    "ncode",
     "postrouting",
-    "pting",
     "smartstore",
     "tfpath",
-    "tive",
     "useast",
     "wineof"
   ],
-  "ignorePaths": [".git", "node_modules", "*.lock", "*.hcl"]
+  "ignorePaths": [".git", "node_modules", "*.lock", "**/.terraform.lock.hcl"]
 }
