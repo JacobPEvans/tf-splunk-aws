@@ -45,6 +45,10 @@ name: "AI Moderator"
   # skip-bots: # Skip-bots processed as bot check in pre-activation job
   # - github-actions # Skip-bots processed as bot check in pre-activation job
   # - copilot # Skip-bots processed as bot check in pre-activation job
+  # - renovate # Skip-bots processed as bot check in pre-activation job
+  # - dependabot # Skip-bots processed as bot check in pre-activation job
+  # - release-please # Skip-bots processed as bot check in pre-activation job
+  # - jacobpevans-github-actions # Skip-bots processed as bot check in pre-activation job
   # skip-roles: # Skip-roles processed as role check in pre-activation job
   # - admin # Skip-roles processed as role check in pre-activation job
   # - maintainer # Skip-roles processed as role check in pre-activation job
@@ -78,17 +82,12 @@ jobs:
       text: ${{ steps.sanitized.outputs.text }}
       title: ${{ steps.sanitized.outputs.title }}
     steps:
-      - name: Checkout actions folder
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: github/gh-aw
-          sparse-checkout: |
-            actions
-          persist-credentials: false
       - name: Setup Scripts
-        uses: ./actions/setup
+        id: setup
+        uses: github/gh-aw-actions/setup@ea222e359276c0702a5f5203547ff9d88d0ddd76 # v0.68.1
         with:
           destination: ${{ runner.temp }}/gh-aw/actions
+          job-name: ${{ github.job }}
       - name: Generate agentic run info
         id: generate_aw_info
         env:
@@ -314,17 +313,12 @@ jobs:
       output: ${{ steps.collect_output.outputs.output }}
       output_types: ${{ steps.collect_output.outputs.output_types }}
     steps:
-      - name: Checkout actions folder
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: github/gh-aw
-          sparse-checkout: |
-            actions
-          persist-credentials: false
       - name: Setup Scripts
-        uses: ./actions/setup
+        id: setup
+        uses: github/gh-aw-actions/setup@ea222e359276c0702a5f5203547ff9d88d0ddd76 # v0.68.1
         with:
           destination: ${{ runner.temp }}/gh-aw/actions
+          job-name: ${{ github.job }}
       - name: Set runtime paths
         id: set-runtime-paths
         run: |
@@ -825,17 +819,12 @@ jobs:
       tools_reported: ${{ steps.missing_tool.outputs.tools_reported }}
       total_count: ${{ steps.missing_tool.outputs.total_count }}
     steps:
-      - name: Checkout actions folder
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: github/gh-aw
-          sparse-checkout: |
-            actions
-          persist-credentials: false
       - name: Setup Scripts
-        uses: ./actions/setup
+        id: setup
+        uses: github/gh-aw-actions/setup@ea222e359276c0702a5f5203547ff9d88d0ddd76 # v0.68.1
         with:
           destination: ${{ runner.temp }}/gh-aw/actions
+          job-name: ${{ github.job }}
       - name: Download agent output artifact
         id: download-agent-output
         continue-on-error: true
@@ -929,17 +918,12 @@ jobs:
       activated: ${{ steps.check_skip_roles.outputs.skip_roles_ok == 'true' && steps.check_skip_bots.outputs.skip_bots_ok == 'true' }}
       matched_command: ''
     steps:
-      - name: Checkout actions folder
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: github/gh-aw
-          sparse-checkout: |
-            actions
-          persist-credentials: false
       - name: Setup Scripts
-        uses: ./actions/setup
+        id: setup
+        uses: github/gh-aw-actions/setup@ea222e359276c0702a5f5203547ff9d88d0ddd76 # v0.68.1
         with:
           destination: ${{ runner.temp }}/gh-aw/actions
+          job-name: ${{ github.job }}
       - name: Check skip-roles
         id: check_skip_roles
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
@@ -957,7 +941,7 @@ jobs:
         id: check_skip_bots
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
-          GH_AW_SKIP_BOTS: "github-actions,copilot"
+          GH_AW_SKIP_BOTS: "github-actions,copilot,renovate,dependabot,release-please,jacobpevans-github-actions"
           GH_AW_WORKFLOW_NAME: "AI Moderator"
         with:
           script: |
@@ -993,17 +977,12 @@ jobs:
       process_safe_outputs_processed_count: ${{ steps.process_safe_outputs.outputs.processed_count }}
       process_safe_outputs_temporary_id_map: ${{ steps.process_safe_outputs.outputs.temporary_id_map }}
     steps:
-      - name: Checkout actions folder
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: github/gh-aw
-          sparse-checkout: |
-            actions
-          persist-credentials: false
       - name: Setup Scripts
-        uses: ./actions/setup
+        id: setup
+        uses: github/gh-aw-actions/setup@ea222e359276c0702a5f5203547ff9d88d0ddd76 # v0.68.1
         with:
           destination: ${{ runner.temp }}/gh-aw/actions
+          job-name: ${{ github.job }}
       - name: Download agent output artifact
         id: download-agent-output
         continue-on-error: true
@@ -1062,17 +1041,12 @@ jobs:
       issues: write
     timeout-minutes: 5
     steps:
-      - name: Checkout actions folder
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: github/gh-aw
-          sparse-checkout: |
-            actions
-          persist-credentials: false
       - name: Setup Scripts
-        uses: ./actions/setup
+        id: setup
+        uses: github/gh-aw-actions/setup@ea222e359276c0702a5f5203547ff9d88d0ddd76 # v0.68.1
         with:
           destination: ${{ runner.temp }}/gh-aw/actions
+          job-name: ${{ github.job }}
       - name: Unlock issue after agent workflow
         id: unlock-issue
         if: (github.event_name == 'issues' || github.event_name == 'issue_comment') && needs.activation.outputs.issue_locked == 'true'
