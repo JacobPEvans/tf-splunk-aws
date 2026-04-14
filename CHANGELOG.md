@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.1](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.14.0...v0.14.1) (2026-04-14)
+
+
+### Bug Fixes
+
+* add automation bots to AI Moderator skip-bots ([#115](https://github.com/JacobPEvans/tf-splunk-aws/issues/115)) ([6d43a90](https://github.com/JacobPEvans/tf-splunk-aws/commit/6d43a9051de92455fca639118461bc77f130139d))
+
 ## [0.14.0](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.13.0...v0.14.0) (2026-04-12)
 
 
