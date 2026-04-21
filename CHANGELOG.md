@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.2](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.14.1...v0.14.2) (2026-04-21)
+
+
+### Bug Fixes
+
+* **ci:** add gh-aw-pin-refresh workflow and recompile lock files ([b72ea50](https://github.com/JacobPEvans/tf-splunk-aws/commit/b72ea5086123121763d788853cc4fbe98cd6bb2c)), closes [#120](https://github.com/JacobPEvans/tf-splunk-aws/issues/120) [#133](https://github.com/JacobPEvans/tf-splunk-aws/issues/133) [#134](https://github.com/JacobPEvans/tf-splunk-aws/issues/134)
+
 ## [0.14.1](https://github.com/JacobPEvans/tf-splunk-aws/compare/v0.14.0...v0.14.1) (2026-04-14)
 
 
