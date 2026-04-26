@@ -1,6 +1,9 @@
 # TF-Splunk-AWS
 
-Cost-optimized Splunk infrastructure on AWS using Terraform and Terragrunt.
+[![CI](https://github.com/JacobPEvans/tf-splunk-aws/actions/workflows/terraform.yml/badge.svg)](https://github.com/JacobPEvans/tf-splunk-aws/actions/workflows/terraform.yml)
+[![License](https://img.shields.io/github/license/JacobPEvans/tf-splunk-aws)](LICENSE)
+
+Cost-optimized Splunk infrastructure on AWS using OpenTofu and Terragrunt.
 **~$9–$18.17/month** (SmartStore + optional auto-lifecycle).
 
 ## What & Why
